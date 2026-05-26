@@ -5,7 +5,6 @@ const supabase = createClient(
   'https://zhivpkjrgobfwzvcclnb.supabase.co',
   'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
 );
-
 const teams = [
   'กฟน.1','กฟน.2','กฟน.3',
   'กฟฉ.1','กฟฉ.2','กฟฉ.3',
