@@ -9,19 +9,17 @@ const supabase = createClient(
 const teams = ['กฟน.1','กฟน.2','กฟน.3','กฟฉ.1','กฟฉ.2','กฟฉ.3','กฟก.1','กฟก.2','กฟก.3','กฟต.1','กฟต.2','กฟต.3'];
 
 const scoreKeys = [
-  'maintenance',
-  'outage',
-  'inspection',
-  'treecut',
-  'thermal'
+  'onsite',
+  'theory',
+  'fieldwork',
+  'presentation'
 ];
 
 const scoreLabels = {
-  maintenance:'ด้านงานปรับปรุง/บำรุงรักษาระบบไฟฟ้า',
-  outage:'ด้านงานแก้ไฟฟ้าขัดข้อง',
-  inspection:'ด้านงานตรวจสอบระบบไฟฟ้า',
-  treecut:'ด้านงานตัดต้นไม้',
-  thermal:'ด้านงานส่องกล้องความร้อน'
+  onsite:'คะแนนตรวจประเมิน ณ กฟฟ. หน้างาน',
+  theory:'คะแนนภาคทฤษฎี',
+  fieldwork:'คะแนนแข่งภาคสนาม',
+  presentation:'คะแนนการนำเสนอผลงาน'
 };
 
 const judges = [
@@ -163,7 +161,10 @@ export default function App(){
             {scoreKeys.map(k=>(
               <div key={k} style={{marginTop:'10px'}}>
                 <input
-                  type="number"
+  type="number"
+  min="0"
+  max="5"
+  step="0.1"
                   placeholder={scoreLabels[k]}
                   value={form[k]}
                   onChange={e=>setForm({...form,[k]:e.target.value})}
@@ -189,7 +190,7 @@ export default function App(){
                 marginTop:'15px',
                 width:'100%',
                 padding:'12px',
-                background:'#2563eb',
+                background:'#linear-gradient(90deg,#2563eb,#06b6d4)',
                 color:'#fff',
                 border:'none',
                 borderRadius:'10px'
