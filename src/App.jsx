@@ -133,19 +133,51 @@ export default function App(){
   },[rows]);
 
   return (
-    <div style={{padding:'20px',fontFamily:'sans-serif',background:'#f8fafc',minHeight:'100vh'}}>
-      <div style={{maxWidth:'1400px',margin:'0 auto'}}>
+   <div
+    style={{
+      minHeight:'100vh',
+      padding:'24px',
+      background:'linear-gradient(135deg,#dbeafe,#eff6ff,#ffffff)'
+    }}
+  >
         <h1>ระบบลงคะแนนการแข่งขัน</h1>
 
-        <div style={{background:'#fff',padding:'15px',borderRadius:'12px',marginBottom:'20px'}}>
-          <span>กรรมการ: </span>
+       <div style={{
+  background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+  borderRadius:'24px',
+  padding:'30px',
+  color:'#fff',
+  marginBottom:'20px',
+  boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
+}}>
 
-          <select value={user} onChange={e=>setUser(e.target.value)}>
-            {judges.map(j=><option key={j.name}>{j.name}</option>)}
-          </select>
+  <h1 style={{
+    fontSize:'38px',
+    fontWeight:'bold',
+    marginBottom:'10px'
+  }}>
+    🏆 ระบบลงคะแนนการแข่งขัน
+  </h1>
 
-          <span style={{marginLeft:'10px'}}>{current.role}</span>
-        </div>
+  <div style={{
+    fontSize:'20px',
+    opacity:0.95
+  }}>
+    การปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
+  </div>
+
+  <div style={{
+    marginTop:'12px',
+    fontSize:'15px',
+    background:'rgba(255,255,255,0.2)',
+    display:'inline-block',
+    padding:'8px 14px',
+    borderRadius:'999px'
+  }}>
+    ⚡ ถ่ายทอดสดคะแนนออนไลน์
+  </div>
+
+</div>
 
         <div style={{display:'grid',gridTemplateColumns:'1fr 2fr',gap:'20px'}}>
 
