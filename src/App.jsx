@@ -3,24 +3,15 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   'https://zhivpkjrgobfwzvcclnb.supabase.co',
-  'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
+  'PUT_YOUR_SUPABASE_KEY_HERE'
 );
 
-const teams = ['กฟน.1','กฟน.2','กฟน.3','กฟฉ.1','กฟฉ.2','กฟฉ.3','กฟก.1','กฟก.2','กฟก.3','กฟต.1','กฟต.2','กฟต.3'];
-
-const scoreKeys = [
-  'onsite',
-  'theory',
-  'fieldwork',
-  'presentation'
+const teams = [
+  'กฟน.1','กฟน.2','กฟน.3',
+  'กฟฉ.1','กฟฉ.2','กฟฉ.3',
+  'กฟก.1','กฟก.2','กฟก.3',
+  'กฟต.1','กฟต.2','กฟต.3'
 ];
-
-const scoreLabels = {
-  onsite:'คะแนนตรวจประเมิน ณ กฟฟ. หน้างาน',
-  theory:'คะแนนภาคทฤษฎี',
-  fieldwork:'คะแนนแข่งภาคสนาม',
-  presentation:'คะแนนการนำเสนอผลงาน'
-};
 
 const judges = [
   {name:'นางนงลักษณ์ สุวรรณจำรัส',role:'ประธาน'},
@@ -38,394 +29,618 @@ const judges = [
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'}
 ];
 
-export default function App(){
-  const [rows,setRows]=useState([]);
-  const [preview,setPreview]=useState(false);
-  const [openTeams,setOpenTeams]=useState({});
-  const [user,setUser]=useState(judges[0].name);
+const categories = [
+  {
+    key:'onsite',
+    label:'คะแนนตรวจประเมิน ณ กฟฟ. หน้างาน'
+  },
+  {
+    key:'theory',
+    label:'คะแนนภาคทฤษฎี'
+  },
+  {
+    key:'fieldwork',
+    label:'คะแนนแข่งภาคสนาม'
+  },
+  {
+    key:'presentation',
+    label:'คะแนนการนำเสนอผลงาน'
+  }
+];
 
-  const [form,setForm]=useState({
+const adminUsers = [
+  'นางนงลักษณ์ สุวรรณจำรัส'
+];
+
+export default function App(){
+
+  const [rows,setRows] = useState([]);
+  const [preview,setPreview] = useState(false);
+
+  const [user,setUser] = useState(judges[0].name);
+
+  const [f,setF] = useState({
     team:teams[0],
-    signed:false,
-    maintenance:'',
-    outage:'',
-    inspection:'',
-    treecut:'',
-    thermal:''
+    category:'onsite',
+    score:'',
+    signed:false
   });
 
-  const current=judges.find(j=>j.name===user);
+  const current = judges.find(j=>j.name===user);
 
-  const loadScores = async()=>{
-    const {data,error}=await supabase.from('scores').select('*').order('id',{ascending:false});
-    if(!error && data) setRows(data);
-  };
+  const isAdmin = adminUsers.includes(user);
 
   useEffect(()=>{
     loadScores();
   },[]);
 
-  const add=async()=>{
-    if(!form.signed) return;
+  async function loadScores(){
 
-    const total = scoreKeys.reduce((a,k)=>a+Number(form[k]||0),0);
+    const { data } = await supabase
+      .from('scores')
+      .select('*')
+      .order('id',{ascending:false});
 
-    const payload = {
-      team:form.team,
-      judge:user,
-      role:current.role,
-      maintenance:Number(form.maintenance||0),
-      outage:Number(form.outage||0),
-      inspection:Number(form.inspection||0),
-      treecut:Number(form.treecut||0),
-      thermal:Number(form.thermal||0),
-      total,
-      time:new Date().toLocaleString('th-TH')
-    };
-
-    const {error}=await supabase.from('scores').insert([payload]);
-
-    if(error){
-      alert(error.message);
-      return;
+    if(data){
+      setRows(data);
     }
 
-    await loadScores();
+  }
 
-    setForm({
+  const exists = rows.some(
+    r =>
+      r.team===f.team &&
+      r.judge===user &&
+      r.category===f.category
+  );
+
+  async function add(){
+
+    if(!f.signed || exists) return;
+
+    await supabase.from('scores').insert([{
+      team:f.team,
+      judge:user,
+      role:current.role,
+      category:f.category,
+      score:Number(f.score||0),
+      created_at:new Date()
+    }]);
+
+    setPreview(false);
+
+    setF({
       team:teams[0],
-      signed:false,
-      maintenance:'',
-      outage:'',
-      inspection:'',
-      treecut:'',
-      thermal:''
+      category:'onsite',
+      score:'',
+      signed:false
     });
-  };
 
-  const groupedRows = teams.map(team=>({
-    team,
-    rows:rows.filter(r=>r.team===team)
-  })).filter(g=>g.rows.length);
+    loadScores();
 
-  const avg = useMemo(()=>{
+  }
+
+  const myRows = rows.filter(
+    r=>r.judge===user
+  );
+
+  const ranking = useMemo(()=>{
+
     return teams.map(team=>{
+
       const rs = rows.filter(r=>r.team===team);
 
-      const perCategory = scoreKeys.reduce((acc,k)=>{
-        const value = rs.length
-          ? +(rs.reduce((s,r)=>s+Number(r[k]||0),0)/rs.length).toFixed(2)
-          : 0;
+      const total = rs.reduce(
+        (a,b)=>a+Number(b.score||0),
+        0
+      );
 
-        return {...acc,[k]:value};
-      },{});
-
-      const score = scoreKeys.reduce((a,k)=>a+perCategory[k],0);
+      const avg = rs.length
+        ? total / rs.length
+        : 0;
 
       return {
         team,
-        perCategory,
-        score:+score.toFixed(2),
-        medal: score>=90?'ทอง':score>=80?'เงิน':score>=70?'ทองแดง':'-'
+        avg:+avg.toFixed(2),
+        total:+total.toFixed(2),
+        count:rs.length
       };
-    }).sort((a,b)=>b.score-a.score)
-      .map((r,i)=>({...r,rank:i+1}));
+
+    }).sort((a,b)=>b.avg-a.avg);
+
   },[rows]);
 
   return (
-   <div
-    style={{
-      minHeight:'100vh',
-      padding:'24px',
-      background:'linear-gradient(135deg,#dbeafe,#eff6ff,#ffffff)'
-    }}
-  >
-        <h1>ระบบลงคะแนนการแข่งขัน</h1>
-
-       <div style={{
-  background:'linear-gradient(90deg,#2563eb,#06b6d4)',
-  borderRadius:'24px',
-  padding:'30px',
-  color:'#fff',
-  marginBottom:'20px',
-  boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
-}}>
-
-  <h1 style={{
-    fontSize:'38px',
-    fontWeight:'bold',
-    marginBottom:'10px'
-  }}>
-    🏆 ระบบลงคะแนนการแข่งขัน
-  </h1>
-
-  <div style={{
-    fontSize:'20px',
-    opacity:0.95
-  }}>
-    การปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
-  </div>
-
-  <div style={{
-    marginTop:'12px',
-    fontSize:'15px',
-    background:'rgba(255,255,255,0.2)',
-    display:'inline-block',
-    padding:'8px 14px',
-    borderRadius:'999px'
-  }}>
-    ⚡ ถ่ายทอดสดคะแนนออนไลน์
-  </div>
-
-</div>
-
-        <div style={{display:'grid',gridTemplateColumns:'1fr 2fr',gap:'20px'}}>
-
-          <div style={{background:'#fff',padding:'15px',borderRadius:'12px'}}>
-
-            <select
-              value={form.team}
-              onChange={e=>setForm({...form,team:e.target.value})}
-              style={{width:'100%',padding:'10px'}}
-            >
-              {teams.map(t=><option key={t}>{t}</option>)}
-            </select>
-
-            {scoreKeys.map(k=>(
-              <div key={k} style={{marginTop:'10px'}}>
-                <input
-  type="number"
-  min="0"
-  max="5"
-  step="0.1"
-                  placeholder={scoreLabels[k]}
-                  value={form[k]}
-                  onChange={e=>setForm({...form,[k]:e.target.value})}
-                  style={{width:'100%',padding:'10px'}}
-                />
-              </div>
-            ))}
-
-            <div style={{marginTop:'10px'}}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={form.signed}
-                  onChange={e=>setForm({...form,signed:e.target.checked})}
-                />
-                เซ็นรับรองคะแนน
-              </label>
-            </div>
-
-           <button
-  onClick={()=>setPreview(true)}
-  style={{
-                marginTop:'15px',
-                width:'100%',
-                padding:'12px',
-                background:'#linear-gradient(90deg,#2563eb,#06b6d4)',
-                color:'#fff',
-                border:'none',
-                borderRadius:'10px'
-              }}
-            >
-              บันทึก
-            </button>
-          </div>
-
-          <div style={{background:'#fff',padding:'15px',borderRadius:'12px',overflowX:'auto'}}>
-            <h2>คะแนนทุกกรรมการ</h2>
-
-            {groupedRows.map(group=>{
-
-              const summary = scoreKeys.reduce((acc,k)=>{
-                acc[k] = +(group.rows.reduce((s,r)=>s+Number(r[k]||0),0)/group.rows.length).toFixed(2);
-                return acc;
-              },{});
-
-              const total = scoreKeys.reduce((a,k)=>a+summary[k],0).toFixed(2);
-
-              return (
-                <div key={group.team} style={{border:'1px solid #ddd',marginBottom:'15px',borderRadius:'10px'}}>
-
-                  <button
-                    onClick={()=>setOpenTeams(prev=>({...prev,[group.team]:!prev[group.team]}))}
-                    style={{
-                      width:'100%',
-                      padding:'12px',
-                      border:'none',
-                      background:'#e2e8f0',
-                      textAlign:'left',
-                      fontWeight:'bold'
-                    }}
-                  >
-                    {group.team} ({group.rows.length} คน)
-                  </button>
-
-                  {openTeams[group.team] && (
-                    <div style={{padding:'10px',overflowX:'auto'}}>
-
-                      <table width="100%" border="1" cellPadding="8"
-                        style={{borderCollapse:'collapse',textAlign:'center'}}>
-
-                        <thead style={{background:'#f1f5f9'}}>
-                          <tr>
-                            <th>กรรมการ</th>
-                            {scoreKeys.map(k=><th key={k}>{scoreLabels[k]}</th>)}
-                            <th>รวม</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {group.rows.map((r,i)=>(
-                            <tr key={i}>
-                              <td>{r.judge}</td>
-                              {scoreKeys.map(k=><td key={k}>{r[k]}</td>)}
-                              <td>{r.total}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-
-                        <tfoot style={{background:'#fef9c3',fontWeight:'bold'}}>
-                          <tr>
-                            <td>เฉลี่ยทีม</td>
-                            {scoreKeys.map(k=><td key={k}>{summary[k]}</td>)}
-                            <td>{total}</td>
-                          </tr>
-                        </tfoot>
-
-                      </table>
-
-                    </div>
-                  )}
-
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div style={{background:'#fff',padding:'15px',borderRadius:'12px',marginTop:'20px',overflowX:'auto'}}>
-          <h2>อันดับรวม</h2>
-
-          <table width="100%" border="1" cellPadding="8"
-            style={{borderCollapse:'collapse',textAlign:'center'}}>
-
-            <thead style={{background:'#f1f5f9'}}>
-              <tr>
-                <th>อันดับ</th>
-                <th>ทีม</th>
-                {scoreKeys.map(k=><th key={k}>{scoreLabels[k]}</th>)}
-                <th>รวม</th>
-                <th>เหรียญ</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {avg.map((r,i)=>(
-                <tr key={i}>
-                  <td>{r.rank}</td>
-                  <td>{r.team}</td>
-                  {scoreKeys.map(k=><td key={k}>{r.perCategory[k]}</td>)}
-                  <td>{r.score}</td>
-                  <td>{r.medal}</td>
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
-{preview && (
-  <div style={{
-    position:'fixed',
-    inset:0,
-    background:'rgba(0,0,0,0.5)',
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center',
-    zIndex:999
-  }}>
 
     <div style={{
-      background:'#fff',
-      padding:'25px',
-      borderRadius:'20px',
-      width:'420px',
-      maxWidth:'95%'
+      minHeight:'100vh',
+      background:'linear-gradient(135deg,#dbeafe,#eff6ff,#ffffff)',
+      padding:'24px',
+      fontFamily:'sans-serif'
     }}>
 
-      <h2 style={{marginBottom:'15px'}}>
-        ตรวจสอบคะแนนก่อนส่ง
-      </h2>
-
-      <div style={{lineHeight:'2'}}>
-
-        <div>
-          <b>ทีม:</b> {form.team}
-        </div>
-
-        {scoreKeys.map(k=>(
-          <div key={k}>
-            <b>{scoreLabels[k]}:</b> {form[k]}
-          </div>
-        ))}
-
-        <hr style={{margin:'15px 0'}} />
-
-        <div style={{fontSize:'20px'}}>
-          <b>
-            รวมคะแนน:
-            {' '}
-            {scoreKeys.reduce((a,k)=>a+Number(form[k]||0),0).toFixed(1)}
-          </b>
-        </div>
-
-      </div>
-
       <div style={{
-        display:'flex',
-        gap:'10px',
-        marginTop:'20px'
+        maxWidth:'1400px',
+        margin:'0 auto'
       }}>
 
-        <button
-          onClick={()=>setPreview(false)}
-          style={{
-            flex:1,
-            padding:'12px',
-            border:'none',
-            borderRadius:'12px',
-            background:'#cbd5e1'
-          }}
-        >
-          ย้อนกลับ
-        </button>
+        {/* HEADER */}
 
-        <button
-          onClick={()=>{
-            setPreview(false);
-            add();
-          }}
-          style={{
-            flex:1,
-            padding:'12px',
-            border:'none',
-            borderRadius:'12px',
-            background:'linear-gradient(90deg,#2563eb,#06b6d4)',
-            color:'#fff',
-            fontWeight:'bold'
-          }}
-        >
-          ยืนยันส่งคะแนน
-        </button>
+        <div style={{
+          background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+          padding:'35px',
+          borderRadius:'28px',
+          color:'#fff',
+          marginBottom:'25px',
+          boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
+        }}>
+
+          <div style={{
+            fontSize:'40px',
+            fontWeight:'bold',
+            marginBottom:'10px'
+          }}>
+            🏆 ระบบลงคะแนนการแข่งขัน
+          </div>
+
+          <div style={{
+            fontSize:'22px',
+            opacity:0.95
+          }}>
+            การปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
+          </div>
+
+        </div>
+
+        {/* CONTENT */}
+
+        <div style={{
+          display:'grid',
+          gridTemplateColumns:'1fr 2fr',
+          gap:'20px'
+        }}>
+
+          {/* FORM */}
+
+          <div style={{
+            background:'#fff',
+            borderRadius:'24px',
+            padding:'24px',
+            boxShadow:'0 10px 25px rgba(0,0,0,0.08)'
+          }}>
+
+            <h2 style={{
+              marginBottom:'20px',
+              fontSize:'24px'
+            }}>
+              👨‍⚖️ แบบฟอร์มลงคะแนน
+            </h2>
+
+            {/* JUDGE */}
+
+            <div style={{marginBottom:'18px'}}>
+
+              <div style={labelStyle}>
+                เลือกกรรมการ
+              </div>
+
+              <select
+                value={user}
+                onChange={e=>setUser(e.target.value)}
+                style={inputStyle}
+              >
+                {judges.map(j=>(
+                  <option key={j.name}>
+                    {j.name}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+
+            <div style={{
+              background:'#eff6ff',
+              padding:'12px',
+              borderRadius:'14px',
+              marginBottom:'20px'
+            }}>
+              ตำแหน่ง: {current.role}
+            </div>
+
+            {/* TEAM */}
+
+            <div style={{marginBottom:'18px'}}>
+
+              <div style={labelStyle}>
+                เลือกทีมแข่งขัน
+              </div>
+
+              <select
+                value={f.team}
+                onChange={e=>setF({
+                  ...f,
+                  team:e.target.value
+                })}
+                style={inputStyle}
+              >
+                {teams.map(t=>(
+                  <option key={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+
+            {/* CATEGORY */}
+
+            <div style={{marginBottom:'18px'}}>
+
+              <div style={labelStyle}>
+                เลือกประเภทคะแนน
+              </div>
+
+              <select
+                value={f.category}
+                onChange={e=>setF({
+                  ...f,
+                  category:e.target.value
+                })}
+                style={inputStyle}
+              >
+                {categories.map(c=>(
+                  <option
+                    key={c.key}
+                    value={c.key}
+                  >
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+
+            </div>
+
+            {/* SCORE */}
+
+            <div style={{marginBottom:'18px'}}>
+
+              <div style={labelStyle}>
+                คะแนน (0 - 5)
+              </div>
+
+              <input
+                type='number'
+                min='0'
+                max='5'
+                step='0.1'
+                value={f.score}
+                onChange={e=>setF({
+                  ...f,
+                  score:e.target.value
+                })}
+                placeholder='0.0 - 5.0'
+                style={inputStyle}
+              />
+
+            </div>
+
+            <label style={{
+              display:'flex',
+              gap:'10px',
+              marginTop:'20px'
+            }}>
+
+              <input
+                type='checkbox'
+                checked={f.signed}
+                onChange={e=>setF({
+                  ...f,
+                  signed:e.target.checked
+                })}
+              />
+
+              ยืนยันการตรวจสอบคะแนน
+
+            </label>
+
+            {exists && (
+              <div style={{
+                color:'red',
+                marginTop:'14px'
+              }}>
+                ลงคะแนนประเภทนี้ให้ทีมนี้แล้ว
+              </div>
+            )}
+
+            <button
+              disabled={!f.signed || exists}
+              onClick={()=>setPreview(true)}
+              style={{
+                width:'100%',
+                marginTop:'24px',
+                padding:'16px',
+                border:'none',
+                borderRadius:'18px',
+                background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+                color:'#fff',
+                fontSize:'18px',
+                fontWeight:'bold',
+                cursor:'pointer',
+                opacity:(!f.signed || exists)?0.5:1
+              }}
+            >
+              ✅ ตรวจสอบก่อนส่งคะแนน
+            </button>
+
+          </div>
+
+          {/* MY SCORE */}
+
+          <div style={{
+            background:'#fff',
+            borderRadius:'24px',
+            padding:'24px',
+            boxShadow:'0 10px 25px rgba(0,0,0,0.08)',
+            overflow:'auto'
+          }}>
+
+            <h2 style={{
+              marginBottom:'20px',
+              fontSize:'24px'
+            }}>
+              📋 คะแนนที่ฉันลงไว้
+            </h2>
+
+            <table style={{
+              width:'100%',
+              borderCollapse:'collapse'
+            }}>
+
+              <thead style={{
+                background:'#eff6ff'
+              }}>
+                <tr>
+                  <th style={thStyle}>ทีม</th>
+                  <th style={thStyle}>ประเภทคะแนน</th>
+                  <th style={thStyle}>คะแนน</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {myRows.map((r,i)=>(
+
+                  <tr key={i}>
+
+                    <td style={tdStyle}>
+                      {r.team}
+                    </td>
+
+                    <td style={tdStyle}>
+                      {
+                        categories.find(
+                          c=>c.key===r.category
+                        )?.label
+                      }
+                    </td>
+
+                    <td style={tdStyle}>
+                      <b>{r.score}</b>
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+        {/* ADMIN ONLY */}
+
+        {isAdmin && (
+
+          <div style={{
+            marginTop:'24px',
+            background:'#fff',
+            borderRadius:'24px',
+            padding:'24px',
+            boxShadow:'0 10px 25px rgba(0,0,0,0.08)',
+            overflow:'auto'
+          }}>
+
+            <h2 style={{
+              marginBottom:'20px',
+              fontSize:'24px'
+            }}>
+              🔒 ตารางคะแนนรวม (เฉพาะผู้มีสิทธิ์)
+            </h2>
+
+            <table style={{
+              width:'100%',
+              borderCollapse:'collapse'
+            }}>
+
+              <thead style={{
+                background:'#eff6ff'
+              }}>
+
+                <tr>
+                  <th style={thStyle}>อันดับ</th>
+                  <th style={thStyle}>ทีม</th>
+                  <th style={thStyle}>คะแนนรวม</th>
+                  <th style={thStyle}>คะแนนเฉลี่ย</th>
+                  <th style={thStyle}>จำนวนคะแนน</th>
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {ranking.map((r,i)=>(
+
+                  <tr key={i}>
+
+                    <td style={tdStyle}>
+                      {i+1}
+                    </td>
+
+                    <td style={tdStyle}>
+                      <b>{r.team}</b>
+                    </td>
+
+                    <td style={tdStyle}>
+                      {r.total}
+                    </td>
+
+                    <td style={tdStyle}>
+                      {r.avg}
+                    </td>
+
+                    <td style={tdStyle}>
+                      {r.count}
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        )}
 
       </div>
 
+      {/* POPUP */}
+
+      {preview && (
+
+        <div style={{
+          position:'fixed',
+          inset:0,
+          background:'rgba(0,0,0,0.5)',
+          display:'flex',
+          justifyContent:'center',
+          alignItems:'center',
+          zIndex:999
+        }}>
+
+          <div style={{
+            background:'#fff',
+            padding:'30px',
+            borderRadius:'24px',
+            width:'450px',
+            maxWidth:'95%'
+          }}>
+
+            <h2 style={{
+              marginBottom:'20px',
+              fontSize:'28px'
+            }}>
+              🔍 ตรวจสอบคะแนนก่อนส่ง
+            </h2>
+
+            <div style={{
+              lineHeight:'2.2'
+            }}>
+
+              <div>
+                <b>ทีม:</b> {f.team}
+              </div>
+
+              <div>
+                <b>ประเภท:</b>{' '}
+                {
+                  categories.find(
+                    c=>c.key===f.category
+                  )?.label
+                }
+              </div>
+
+              <div>
+                <b>คะแนน:</b> {f.score}
+              </div>
+
+            </div>
+
+            <div style={{
+              display:'flex',
+              gap:'12px',
+              marginTop:'24px'
+            }}>
+
+              <button
+                onClick={()=>setPreview(false)}
+                style={{
+                  flex:1,
+                  padding:'14px',
+                  border:'none',
+                  borderRadius:'14px',
+                  background:'#cbd5e1',
+                  fontWeight:'bold'
+                }}
+              >
+                ย้อนกลับ
+              </button>
+
+              <button
+                onClick={add}
+                style={{
+                  flex:1,
+                  padding:'14px',
+                  border:'none',
+                  borderRadius:'14px',
+                  background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+                  color:'#fff',
+                  fontWeight:'bold'
+                }}
+              >
+                ✅ ยืนยันส่งคะแนน
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
     </div>
 
-  </div>
-)}
-      </div>
-    </div>
   );
+
 }
+
+const labelStyle = {
+  marginBottom:'8px',
+  fontWeight:'bold'
+};
+
+const inputStyle = {
+  width:'100%',
+  padding:'14px',
+  borderRadius:'14px',
+  border:'1px solid #cbd5e1',
+  fontSize:'16px'
+};
+
+const thStyle = {
+  padding:'14px',
+  borderBottom:'1px solid #e2e8f0',
+  textAlign:'center'
+};
+
+const tdStyle = {
+  padding:'14px',
+  borderBottom:'1px solid #f1f5f9',
+  textAlign:'center'
+};
