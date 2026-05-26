@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   'https://zhivpkjrgobfwzvcclnb.supabase.co',
-  'sb_publishable_AclsdnLyIUqLzzJgm9dXJw_G2GEnJ95'
+  'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
 );
 
 const teams = [
