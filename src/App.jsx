@@ -40,6 +40,7 @@ const judges = [
 
 export default function App(){
   const [rows,setRows]=useState([]);
+  const [preview,setPreview]=useState(false);
   const [openTeams,setOpenTeams]=useState({});
   const [user,setUser]=useState(judges[0].name);
 
@@ -184,9 +185,9 @@ export default function App(){
               </label>
             </div>
 
-            <button
-              onClick={add}
-              style={{
+           <button
+  onClick={()=>setPreview(true)}
+  style={{
                 marginTop:'15px',
                 width:'100%',
                 padding:'12px',
@@ -302,7 +303,96 @@ export default function App(){
 
           </table>
         </div>
+{preview && (
+  <div style={{
+    position:'fixed',
+    inset:0,
+    background:'rgba(0,0,0,0.5)',
+    display:'flex',
+    justifyContent:'center',
+    alignItems:'center',
+    zIndex:999
+  }}>
 
+    <div style={{
+      background:'#fff',
+      padding:'25px',
+      borderRadius:'20px',
+      width:'420px',
+      maxWidth:'95%'
+    }}>
+
+      <h2 style={{marginBottom:'15px'}}>
+        ตรวจสอบคะแนนก่อนส่ง
+      </h2>
+
+      <div style={{lineHeight:'2'}}>
+
+        <div>
+          <b>ทีม:</b> {form.team}
+        </div>
+
+        {scoreKeys.map(k=>(
+          <div key={k}>
+            <b>{scoreLabels[k]}:</b> {form[k]}
+          </div>
+        ))}
+
+        <hr style={{margin:'15px 0'}} />
+
+        <div style={{fontSize:'20px'}}>
+          <b>
+            รวมคะแนน:
+            {' '}
+            {scoreKeys.reduce((a,k)=>a+Number(form[k]||0),0).toFixed(1)}
+          </b>
+        </div>
+
+      </div>
+
+      <div style={{
+        display:'flex',
+        gap:'10px',
+        marginTop:'20px'
+      }}>
+
+        <button
+          onClick={()=>setPreview(false)}
+          style={{
+            flex:1,
+            padding:'12px',
+            border:'none',
+            borderRadius:'12px',
+            background:'#cbd5e1'
+          }}
+        >
+          ย้อนกลับ
+        </button>
+
+        <button
+          onClick={()=>{
+            setPreview(false);
+            add();
+          }}
+          style={{
+            flex:1,
+            padding:'12px',
+            border:'none',
+            borderRadius:'12px',
+            background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+            color:'#fff',
+            fontWeight:'bold'
+          }}
+        >
+          ยืนยันส่งคะแนน
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
       </div>
     </div>
   );
