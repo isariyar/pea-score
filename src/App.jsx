@@ -695,8 +695,8 @@ const thStyle = {
   textAlign:'center'
 };
 
-const tdStyle = {
-  padding:'14px',
-  borderBottom:'1px solid #f1f5f9',
-  textAlign:'center'
+const tdStyle = { 
+padding:'14px', 
+borderBottom:'1px solid #f1f5f9', 
+textAlign:'center' 
 };
