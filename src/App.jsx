@@ -41,7 +41,23 @@ const normalCategories = [
   }
 ];
 
-const assistantCategories = [
+const onsiteTopics = [ 
+  { 
+    key:'maintenance', label:'1. Maintenance and Improvement' 
+  }, 
+  { 
+    key:'outage', 
+    label:'2. Outage Maintenance' 
+  }, 
+  { key:'patrol',
+   label:'3. Patrol' 
+  }, 
+  { key:'arboriculture',
+   label:'4. Arboriculture' 
+  }, 
+  { key:'thermal', label:'5. Thermal Viewer' 
+  } 
+];
   {
     key:'theory',
     label:'คะแนนภาคทฤษฎี'
@@ -73,10 +89,17 @@ export default function App(){
     ? assistantCategories
     : normalCategories;
 
-  const [f,setF] = useState({
-    team:teams[0],
-    category:categories[0].key,
-    score:'',
+  const [f,setF] = useState({ 
+    team:teams[0], category:categories[0].key, 
+    
+    score:'', 
+    
+    maintenance:'', 
+    outage:'', 
+    patrol:'', 
+    arboriculture:'', 
+    thermal:'', 
+    
     signed:false
   });
 
