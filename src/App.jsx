@@ -130,36 +130,57 @@ export default function App(){
 
   async function add(){
 
-    if(!f.signed || exists) return;
+ async function add(){
 
-    const { error } = await supabase
-      .from('scores')
-      .insert([{
-        team:f.team,
-        judge:user,
-        role:current.role,
-        category:f.category,
-        score:Number(f.score||0),
-        created_at:new Date()
-      }]);
-
-    if(error){
-      alert('เกิดข้อผิดพลาด');
-      return;
-    }
-
-    setPreview(false);
-
-    setF({
-      team:teams[0],
-      category:filteredCategories[0].key,
-      score:'',
-      signed:false
-    });
-
-    loadScores();
-
+  if(!f.signed || exists){
+    return;
   }
+
+  const payload = {
+    team: f.team,
+    judge: user,
+    role: current.role,
+    category: f.category,
+    score: Number(f.score || 0),
+    created_at: new Date().toISOString()
+  };
+
+  console.log(payload);
+
+  const { data, error } = await supabase
+    .from('scores')
+    .insert([payload]);
+
+  console.log(data);
+  console.log(error);
+
+  if(error){
+
+    alert(
+      'เกิดข้อผิดพลาด: ' +
+      error.message
+    );
+
+    return;
+  }
+
+  setPreview(false);
+
+  const isAssistant =
+    assistantJudges.includes(user);
+
+  setF({
+    team: teams[0],
+    category: isAssistant
+      ? 'theory'
+      : 'onsite',
+    score:'',
+    signed:false
+  });
+
+  loadScores();
+
+}
 
   const myRows = rows.filter(
     r=>r.judge===user
