@@ -82,9 +82,7 @@ export default function App(){
   const [preview,setPreview] = useState(false);
 
   const [adminPass,setAdminPass] = useState('');
-  const [adminLogged,setAdminLogged] = useState(
-    localStorage.getItem('pea_admin_login') === 'true'
-  );
+  const [adminLogged,setAdminLogged] = useState(false);
 
   const [user,setUser] = useState(judges[0].name);
 
@@ -100,6 +98,7 @@ export default function App(){
     : normalCategories;
 
   const [f,setF] = useState({
+
     team:teams[0],
     category:'onsite',
 
@@ -116,6 +115,7 @@ export default function App(){
     presentation_qa:'',
 
     signed:false
+
   });
 
   useEffect(()=>{
@@ -151,7 +151,106 @@ export default function App(){
       r.category===f.category
   );
 
-async function add(){ if(!f.signed){ return; } const onsiteTotal = Number(f.maintenance || 0) + Number(f.outage || 0) + Number(f.patrol || 0) + Number(f.arboriculture || 0) + Number(f.thermal || 0); const presentationTotal = Number(f.presentation_check || 0) + Number(f.presentation_analysis || 0) + Number(f.presentation_qa || 0); let finalScore = 0; if(f.category === 'onsite'){ finalScore = onsiteTotal; }else if(f.category === 'presentation'){ finalScore = presentationTotal; }else{ finalScore = Number(f.score || 0); } const payload = { team:f.team, judge:user, role:current.role, category:f.category, score:finalScore, maintenance:Number(f.maintenance || 0), outage:Number(f.outage || 0), patrol:Number(f.patrol || 0), arboriculture:Number(f.arboriculture || 0), thermal:Number(f.thermal || 0), presentation_check:Number(f.presentation_check || 0), presentation_analysis:Number(f.presentation_analysis || 0), presentation_qa:Number(f.presentation_qa || 0), created_at:new Date().toISOString() }; const { error } = await supabase .from('scores') .insert([payload]); if(error){ console.log(error); alert( 'เกิดข้อผิดพลาด: ' + error.message ); return; } alert('บันทึกคะแนนสำเร็จ'); setPreview(false); setF({ team:teams[0], category:categories[0].key, score:'', maintenance:'', outage:'', patrol:'', arboriculture:'', thermal:'', presentation_check:'', presentation_analysis:'', presentation_qa:'', signed:false }); loadScores(); }
+  async function add(){
+
+    if(!f.signed){
+      return;
+    }
+
+    const onsiteTotal =
+
+      Number(f.maintenance || 0) +
+      Number(f.outage || 0) +
+      Number(f.patrol || 0) +
+      Number(f.arboriculture || 0) +
+      Number(f.thermal || 0);
+
+    const presentationTotal =
+
+      Number(f.presentation_check || 0) +
+      Number(f.presentation_analysis || 0) +
+      Number(f.presentation_qa || 0);
+
+    let finalScore = 0;
+
+    if(f.category === 'onsite'){
+
+      finalScore = onsiteTotal;
+
+    }else if(f.category === 'presentation'){
+
+      finalScore = presentationTotal;
+
+    }else{
+
+      finalScore = Number(f.score || 0);
+
+    }
+
+    const payload = {
+
+      team:f.team,
+      judge:user,
+      role:current.role,
+      category:f.category,
+
+      score:finalScore,
+
+      maintenance:Number(f.maintenance || 0),
+      outage:Number(f.outage || 0),
+      patrol:Number(f.patrol || 0),
+      arboriculture:Number(f.arboriculture || 0),
+      thermal:Number(f.thermal || 0),
+
+      presentation_check:Number(f.presentation_check || 0),
+      presentation_analysis:Number(f.presentation_analysis || 0),
+      presentation_qa:Number(f.presentation_qa || 0),
+
+      created_at:new Date().toISOString()
+
+    };
+
+    const { error } = await supabase
+      .from('scores')
+      .insert([payload]);
+
+    if(error){
+
+      console.log(error);
+
+      alert(error.message);
+
+      return;
+    }
+
+    alert('บันทึกคะแนนสำเร็จ');
+
+    setPreview(false);
+
+    setF({
+
+      team:teams[0],
+      category:categories[0].key,
+
+      score:'',
+
+      maintenance:'',
+      outage:'',
+      patrol:'',
+      arboriculture:'',
+      thermal:'',
+
+      presentation_check:'',
+      presentation_analysis:'',
+      presentation_qa:'',
+
+      signed:false
+
+    });
+
+    loadScores();
+
+  }
 
   const myRows = rows.filter(
     r=>r.judge===user
@@ -166,7 +265,7 @@ async function add(){ if(!f.signed){ return; } const onsiteTotal = Number(f.main
       );
 
       const total = rs.reduce(
-        (a,b)=>a+Number(b.score||0),
+        (a,b)=>a+Number(b.score || 0),
         0
       );
 
@@ -208,7 +307,7 @@ async function add(){ if(!f.signed){ return; } const onsiteTotal = Number(f.main
         }}>
 
           <div style={{
-            fontSize:'42px',
+            fontSize:'40px',
             fontWeight:'bold'
           }}>
             🏆 PEAWSC SCORE SYSTEM
@@ -545,29 +644,11 @@ async function add(){ if(!f.signed){ return; } const onsiteTotal = Number(f.main
 
             </label>
 
-            {exists && (
-
-              <div style={{
-                color:'red',
-                marginTop:'12px'
-              }}>
-                ลงคะแนนรายการนี้แล้ว
-              </div>
-
-            )}
-
             <button
-              disabled={!f.signed || exists}
-              onClick={()=>setPreview(true)}
-              style={{
-                ...buttonStyle,
-                opacity:
-                  (!f.signed || exists)
-                  ? 0.5
-                  : 1
-              }}
+              onClick={add}
+              style={buttonStyle}
             >
-              ✅ ตรวจสอบก่อนส่งคะแนน
+              ✅ ส่งคะแนน
             </button>
 
           </div>
@@ -620,7 +701,7 @@ async function add(){ if(!f.signed){ return; } const onsiteTotal = Number(f.main
                     </td>
 
                     <td style={tdStyle}>
-                      <b>{r.score}</b>
+                      {r.score}
                     </td>
 
                   </tr>
