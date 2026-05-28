@@ -27,7 +27,8 @@ const judges = [
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
+  {name:'โสภณ อินทโชติ',role:'ผู้ช่วยกรรมการ'},
+  {name:'อิสริยะ เย็นทรวง',role:'ผู้ช่วยกรรมการ'}
 ];
 
 const normalCategories = [
@@ -41,23 +42,7 @@ const normalCategories = [
   }
 ];
 
-const onsiteTopics = [ 
-  { 
-    key:'maintenance', label:'1. Maintenance and Improvement' 
-  }, 
-  { 
-    key:'outage', 
-    label:'2. Outage Maintenance' 
-  }, 
-  { key:'patrol',
-   label:'3. Patrol' 
-  }, 
-  { key:'arboriculture',
-   label:'4. Arboriculture' 
-  }, 
-  { key:'thermal', label:'5. Thermal Viewer' 
-  } 
-];
+const assistantCategories = [
   {
     key:'theory',
     label:'คะแนนภาคทฤษฎี'
@@ -68,13 +53,38 @@ const onsiteTopics = [
   }
 ];
 
+const onsiteTopics = [
+  {
+    key:'maintenance',
+    label:'1. Maintenance and Improvement'
+  },
+  {
+    key:'outage',
+    label:'2. Outage Maintenance'
+  },
+  {
+    key:'patrol',
+    label:'3. Patrol'
+  },
+  {
+    key:'arboriculture',
+    label:'4. Arboriculture'
+  },
+  {
+    key:'thermal',
+    label:'5. Thermal Viewer'
+  }
+];
+
 export default function App(){
 
   const [rows,setRows] = useState([]);
   const [preview,setPreview] = useState(false);
 
-  const [adminPass,setAdminPass] = useState( localStorage.getItem('pea_admin_pass') || '' );
-  const [adminLogged,setAdminLogged] = useState( localStorage.getItem('pea_admin_login') === 'true' );
+  const [adminPass,setAdminPass] = useState('');
+  const [adminLogged,setAdminLogged] = useState(
+    localStorage.getItem('pea_admin_login') === 'true'
+  );
 
   const [user,setUser] = useState(judges[0].name);
 
@@ -89,17 +99,15 @@ export default function App(){
     ? assistantCategories
     : normalCategories;
 
-  const [f,setF] = useState({ 
-    team:teams[0], category:categories[0].key, 
-    
-    score:'', 
-    
-    maintenance:'', 
-    outage:'', 
-    patrol:'', 
-    arboriculture:'', 
-    thermal:'', 
-    
+  const [f,setF] = useState({
+    team:teams[0],
+    category:'onsite',
+    score:'',
+    maintenance:'',
+    outage:'',
+    patrol:'',
+    arboriculture:'',
+    thermal:'',
     signed:false
   });
 
@@ -142,15 +150,39 @@ export default function App(){
       return;
     }
 
+    const onsiteTotal =
+
+      Number(f.maintenance || 0) +
+      Number(f.outage || 0) +
+      Number(f.patrol || 0) +
+      Number(f.arboriculture || 0) +
+      Number(f.thermal || 0);
+
+    const finalScore =
+
+      f.category === 'onsite'
+      ? onsiteTotal
+      : Number(f.score || 0);
+
     const { error } = await supabase
       .from('scores')
       .insert([{
+
         team:f.team,
         judge:user,
         role:current.role,
         category:f.category,
-        score:Number(f.score || 0),
+
+        score:finalScore,
+
+        maintenance:Number(f.maintenance || 0),
+        outage:Number(f.outage || 0),
+        patrol:Number(f.patrol || 0),
+        arboriculture:Number(f.arboriculture || 0),
+        thermal:Number(f.thermal || 0),
+
         created_at:new Date().toISOString()
+
       }]);
 
     if(error){
@@ -164,6 +196,11 @@ export default function App(){
       team:teams[0],
       category:categories[0].key,
       score:'',
+      maintenance:'',
+      outage:'',
+      patrol:'',
+      arboriculture:'',
+      thermal:'',
       signed:false
     });
 
@@ -222,8 +259,7 @@ export default function App(){
           padding:'35px',
           borderRadius:'28px',
           color:'#fff',
-          marginBottom:'24px',
-          boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
+          marginBottom:'24px'
         }}>
 
           <div style={{
@@ -237,7 +273,7 @@ export default function App(){
             fontSize:'22px',
             marginTop:'10px'
           }}>
-            ระบบลงคะแนนหัวข้อการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
+            ระบบลงคะแนนการแข่งขัน
           </div>
 
         </div>
@@ -332,23 +368,105 @@ export default function App(){
 
             </select>
 
-            <div style={labelStyle}>
-              คะแนน (0 - 5)
-            </div>
+            {f.category === 'onsite' ? (
 
-            <input
-              type='number'
-              min='0'
-              max='5'
-              step='0.1'
-              value={f.score}
-              onChange={e=>setF({
-                ...f,
-                score:e.target.value
-              })}
-              placeholder='0.0 - 5.0'
-              style={inputStyle}
-            />
+              <>
+
+                {onsiteTopics.map(topic=>(
+
+                  <div key={topic.key}>
+
+                    <div style={labelStyle}>
+                      {topic.label} (0 - 12)
+                    </div>
+
+                    <input
+                      type='number'
+                      min='0'
+                      max='12'
+                      step='0.1'
+                      value={f[topic.key]}
+                      onChange={e=>{
+
+                        let value = Number(e.target.value);
+
+                        if(value > 12){
+                          value = 12;
+                        }
+
+                        if(value < 0){
+                          value = 0;
+                        }
+
+                        setF({
+                          ...f,
+                          [topic.key]:value
+                        });
+
+                      }}
+                      style={inputStyle}
+                    />
+
+                  </div>
+
+                ))}
+
+                <div style={{
+                  marginTop:'20px',
+                  background:'#eff6ff',
+                  padding:'16px',
+                  borderRadius:'14px',
+                  fontWeight:'bold',
+                  fontSize:'20px'
+                }}>
+
+                  รวมคะแนน:
+
+                  {' '}
+
+                  {
+
+                    (
+                      Number(f.maintenance || 0) +
+                      Number(f.outage || 0) +
+                      Number(f.patrol || 0) +
+                      Number(f.arboriculture || 0) +
+                      Number(f.thermal || 0)
+
+                    ).toFixed(1)
+
+                  }
+
+                  / 60
+
+                </div>
+
+              </>
+
+            ) : (
+
+              <>
+
+                <div style={labelStyle}>
+                  คะแนน
+                </div>
+
+                <input
+                  type='number'
+                  min='0'
+                  max='100'
+                  step='0.1'
+                  value={f.score}
+                  onChange={e=>setF({
+                    ...f,
+                    score:e.target.value
+                  })}
+                  style={inputStyle}
+                />
+
+              </>
+
+            )}
 
             <label style={{
               display:'flex',
@@ -486,9 +604,18 @@ export default function App(){
                 onClick={()=>{
 
                   if(adminPass==='peawsc2026'){
+
+                    localStorage.setItem(
+                      'pea_admin_login',
+                      'true'
+                    );
+
                     setAdminLogged(true);
+
                   }else{
+
                     alert('รหัสผ่านไม่ถูกต้อง');
+
                   }
 
                 }}
@@ -501,74 +628,102 @@ export default function App(){
 
           ) : (
 
-            <table style={{
-              width:'100%',
-              borderCollapse:'collapse'
-            }}>
+            <>
 
-              <thead>
+              <table style={{
+                width:'100%',
+                borderCollapse:'collapse'
+              }}>
 
-                <tr style={{
-                  background:'#eff6ff'
-                }}>
+                <thead>
 
-                  <th style={thStyle}>
-                    อันดับ
-                  </th>
+                  <tr style={{
+                    background:'#eff6ff'
+                  }}>
 
-                  <th style={thStyle}>
-                    ทีม
-                  </th>
+                    <th style={thStyle}>
+                      อันดับ
+                    </th>
 
-                  <th style={thStyle}>
-                    คะแนนรวม
-                  </th>
+                    <th style={thStyle}>
+                      ทีม
+                    </th>
 
-                  <th style={thStyle}>
-                    คะแนนเฉลี่ย
-                  </th>
+                    <th style={thStyle}>
+                      คะแนนรวม
+                    </th>
 
-                  <th style={thStyle}>
-                    จำนวนคะแนน
-                  </th>
+                    <th style={thStyle}>
+                      คะแนนเฉลี่ย
+                    </th>
 
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {ranking.map((r,i)=>(
-
-                  <tr key={i}>
-
-                    <td style={tdStyle}>
-                      {i+1}
-                    </td>
-
-                    <td style={tdStyle}>
-                      <b>{r.team}</b>
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.total}
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.avg}
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.count}
-                    </td>
+                    <th style={thStyle}>
+                      จำนวนคะแนน
+                    </th>
 
                   </tr>
 
-                ))}
+                </thead>
 
-              </tbody>
+                <tbody>
 
-            </table>
+                  {ranking.map((r,i)=>(
+
+                    <tr key={i}>
+
+                      <td style={tdStyle}>
+                        {i+1}
+                      </td>
+
+                      <td style={tdStyle}>
+                        <b>{r.team}</b>
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.total}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.avg}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.count}
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+              <button
+                onClick={()=>{
+
+                  localStorage.removeItem(
+                    'pea_admin_login'
+                  );
+
+                  setAdminLogged(false);
+
+                }}
+                style={{
+                  marginTop:'20px',
+                  padding:'14px 20px',
+                  border:'none',
+                  borderRadius:'14px',
+                  background:'#ef4444',
+                  color:'#fff',
+                  fontWeight:'bold',
+                  cursor:'pointer'
+                }}
+              >
+                Logout
+              </button>
+
+            </>
 
           )}
 
@@ -614,10 +769,6 @@ export default function App(){
 
               <div>
                 <b>ประเภท:</b> {f.category}
-              </div>
-
-              <div>
-                <b>คะแนน:</b> {f.score}
               </div>
 
             </div>
@@ -721,4 +872,3 @@ const tdStyle = {
   borderBottom:'1px solid #f1f5f9',
   textAlign:'center'
 };
-
