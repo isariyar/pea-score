@@ -102,12 +102,19 @@ export default function App(){
   const [f,setF] = useState({
     team:teams[0],
     category:'onsite',
+
     score:'',
+
     maintenance:'',
     outage:'',
     patrol:'',
     arboriculture:'',
     thermal:'',
+
+    presentation_check:'',
+    presentation_analysis:'',
+    presentation_qa:'',
+
     signed:false
   });
 
@@ -158,10 +165,20 @@ export default function App(){
       Number(f.arboriculture || 0) +
       Number(f.thermal || 0);
 
+    const presentationTotal =
+
+      Number(f.presentation_check || 0) +
+      Number(f.presentation_analysis || 0) +
+      Number(f.presentation_qa || 0);
+
     const finalScore =
 
       f.category === 'onsite'
       ? onsiteTotal
+
+      : f.category === 'presentation'
+      ? presentationTotal
+
       : Number(f.score || 0);
 
     const { error } = await supabase
@@ -181,6 +198,10 @@ export default function App(){
         arboriculture:Number(f.arboriculture || 0),
         thermal:Number(f.thermal || 0),
 
+        presentation_check:Number(f.presentation_check || 0),
+        presentation_analysis:Number(f.presentation_analysis || 0),
+        presentation_qa:Number(f.presentation_qa || 0),
+
         created_at:new Date().toISOString()
 
       }]);
@@ -195,12 +216,19 @@ export default function App(){
     setF({
       team:teams[0],
       category:categories[0].key,
+
       score:'',
+
       maintenance:'',
       outage:'',
       patrol:'',
       arboriculture:'',
       thermal:'',
+
+      presentation_check:'',
+      presentation_analysis:'',
+      presentation_qa:'',
+
       signed:false
     });
 
@@ -411,14 +439,7 @@ export default function App(){
 
                 ))}
 
-                <div style={{
-                  marginTop:'20px',
-                  background:'#eff6ff',
-                  padding:'16px',
-                  borderRadius:'14px',
-                  fontWeight:'bold',
-                  fontSize:'20px'
-                }}>
+                <div style={totalStyle}>
 
                   รวมคะแนน:
 
@@ -438,6 +459,126 @@ export default function App(){
                   }
 
                   / 60
+
+                </div>
+
+              </>
+
+            ) : f.category === 'presentation' ? (
+
+              <>
+
+                <div style={labelStyle}>
+                  1. ตรวจสอบสิ่งผิดปกติ (0 - 5)
+                </div>
+
+                <input
+                  type='number'
+                  min='0'
+                  max='5'
+                  step='0.1'
+                  value={f.presentation_check}
+                  onChange={e=>{
+
+                    let value = Number(e.target.value);
+
+                    if(value > 5){
+                      value = 5;
+                    }
+
+                    if(value < 0){
+                      value = 0;
+                    }
+
+                    setF({
+                      ...f,
+                      presentation_check:value
+                    });
+
+                  }}
+                  style={inputStyle}
+                />
+
+                <div style={labelStyle}>
+                  2. การวิเคราะห์และแก้ไข (0 - 5)
+                </div>
+
+                <input
+                  type='number'
+                  min='0'
+                  max='5'
+                  step='0.1'
+                  value={f.presentation_analysis}
+                  onChange={e=>{
+
+                    let value = Number(e.target.value);
+
+                    if(value > 5){
+                      value = 5;
+                    }
+
+                    if(value < 0){
+                      value = 0;
+                    }
+
+                    setF({
+                      ...f,
+                      presentation_analysis:value
+                    });
+
+                  }}
+                  style={inputStyle}
+                />
+
+                <div style={labelStyle}>
+                  3. ถาม-ตอบ (0 - 5)
+                </div>
+
+                <input
+                  type='number'
+                  min='0'
+                  max='5'
+                  step='0.1'
+                  value={f.presentation_qa}
+                  onChange={e=>{
+
+                    let value = Number(e.target.value);
+
+                    if(value > 5){
+                      value = 5;
+                    }
+
+                    if(value < 0){
+                      value = 0;
+                    }
+
+                    setF({
+                      ...f,
+                      presentation_qa:value
+                    });
+
+                  }}
+                  style={inputStyle}
+                />
+
+                <div style={totalStyle}>
+
+                  รวมคะแนน:
+
+                  {' '}
+
+                  {
+
+                    (
+                      Number(f.presentation_check || 0) +
+                      Number(f.presentation_analysis || 0) +
+                      Number(f.presentation_qa || 0)
+
+                    ).toFixed(1)
+
+                  }
+
+                  / 15
 
                 </div>
 
@@ -577,242 +718,7 @@ export default function App(){
 
         </div>
 
-        <div style={{
-          ...cardStyle,
-          marginTop:'24px'
-        }}>
-
-          <div style={titleStyle}>
-            🔒 ตารางคะแนนรวม
-          </div>
-
-          {!adminLogged ? (
-
-            <>
-
-              <input
-                type='password'
-                placeholder='รหัสผ่าน'
-                value={adminPass}
-                onChange={e=>setAdminPass(
-                  e.target.value
-                )}
-                style={inputStyle}
-              />
-
-              <button
-                onClick={()=>{
-
-                  if(adminPass==='peawsc2026'){
-
-                    localStorage.setItem(
-                      'pea_admin_login',
-                      'true'
-                    );
-
-                    setAdminLogged(true);
-
-                  }else{
-
-                    alert('รหัสผ่านไม่ถูกต้อง');
-
-                  }
-
-                }}
-                style={buttonStyle}
-              >
-                Login
-              </button>
-
-            </>
-
-          ) : (
-
-            <>
-
-              <table style={{
-                width:'100%',
-                borderCollapse:'collapse'
-              }}>
-
-                <thead>
-
-                  <tr style={{
-                    background:'#eff6ff'
-                  }}>
-
-                    <th style={thStyle}>
-                      อันดับ
-                    </th>
-
-                    <th style={thStyle}>
-                      ทีม
-                    </th>
-
-                    <th style={thStyle}>
-                      คะแนนรวม
-                    </th>
-
-                    <th style={thStyle}>
-                      คะแนนเฉลี่ย
-                    </th>
-
-                    <th style={thStyle}>
-                      จำนวนคะแนน
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-                <tbody>
-
-                  {ranking.map((r,i)=>(
-
-                    <tr key={i}>
-
-                      <td style={tdStyle}>
-                        {i+1}
-                      </td>
-
-                      <td style={tdStyle}>
-                        <b>{r.team}</b>
-                      </td>
-
-                      <td style={tdStyle}>
-                        {r.total}
-                      </td>
-
-                      <td style={tdStyle}>
-                        {r.avg}
-                      </td>
-
-                      <td style={tdStyle}>
-                        {r.count}
-                      </td>
-
-                    </tr>
-
-                  ))}
-
-                </tbody>
-
-              </table>
-
-              <button
-                onClick={()=>{
-
-                  localStorage.removeItem(
-                    'pea_admin_login'
-                  );
-
-                  setAdminLogged(false);
-
-                }}
-                style={{
-                  marginTop:'20px',
-                  padding:'14px 20px',
-                  border:'none',
-                  borderRadius:'14px',
-                  background:'#ef4444',
-                  color:'#fff',
-                  fontWeight:'bold',
-                  cursor:'pointer'
-                }}
-              >
-                Logout
-              </button>
-
-            </>
-
-          )}
-
-        </div>
-
       </div>
-
-      {preview && (
-
-        <div style={{
-          position:'fixed',
-          inset:0,
-          background:'rgba(0,0,0,0.5)',
-          display:'flex',
-          justifyContent:'center',
-          alignItems:'center',
-          zIndex:999
-        }}>
-
-          <div style={{
-            background:'#fff',
-            width:'420px',
-            maxWidth:'95%',
-            borderRadius:'24px',
-            padding:'28px'
-          }}>
-
-            <div style={{
-              fontSize:'28px',
-              fontWeight:'bold',
-              marginBottom:'18px'
-            }}>
-              🔍 ตรวจสอบก่อนส่ง
-            </div>
-
-            <div style={{
-              lineHeight:'2'
-            }}>
-
-              <div>
-                <b>ทีม:</b> {f.team}
-              </div>
-
-              <div>
-                <b>ประเภท:</b> {f.category}
-              </div>
-
-            </div>
-
-            <div style={{
-              display:'flex',
-              gap:'12px',
-              marginTop:'24px'
-            }}>
-
-              <button
-                onClick={()=>setPreview(false)}
-                style={{
-                  flex:1,
-                  padding:'14px',
-                  border:'none',
-                  borderRadius:'14px'
-                }}
-              >
-                ย้อนกลับ
-              </button>
-
-              <button
-                onClick={add}
-                style={{
-                  flex:1,
-                  padding:'14px',
-                  border:'none',
-                  borderRadius:'14px',
-                  background:'#2563eb',
-                  color:'#fff',
-                  fontWeight:'bold'
-                }}
-              >
-                ยืนยันส่งคะแนน
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
 
@@ -846,6 +752,15 @@ const inputStyle = {
   border:'1px solid #cbd5e1',
   fontSize:'16px',
   boxSizing:'border-box'
+};
+
+const totalStyle = {
+  marginTop:'20px',
+  background:'#eff6ff',
+  padding:'16px',
+  borderRadius:'14px',
+  fontWeight:'bold',
+  fontSize:'20px'
 };
 
 const buttonStyle = {
