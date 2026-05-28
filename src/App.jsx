@@ -27,8 +27,7 @@ const judges = [
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
-  {name:'โสภณ อินทโชติ',role:'ผู้ช่วยกรรมการ'},
-  {name:'อิสริยะ เย็นทรวง',role:'ผู้ช่วยกรรมการ'}
+  {name:'ทีมงาน กบร./ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
 ];
 
 const normalCategories = [
@@ -208,14 +207,14 @@ export default function App(){
             fontSize:'42px',
             fontWeight:'bold'
           }}>
-            🏆 PEA SCORE SYSTEM
+            🏆 PEAWSC SCORE SYSTEM
           </div>
 
           <div style={{
             fontSize:'22px',
             marginTop:'10px'
           }}>
-            ระบบลงคะแนนการแข่งขันออนไลน์
+            ระบบลงคะแนนหัวข้อการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
           </div>
 
         </div>
