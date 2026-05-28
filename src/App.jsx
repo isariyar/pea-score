@@ -700,4 +700,3 @@ const tdStyle = {
   borderBottom:'1px solid #f1f5f9',
   textAlign:'center'
 };
-```
