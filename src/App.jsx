@@ -1,9 +1,8 @@
-```jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  'https://zhivpkjrgobfwzvcclnb.supabase.co/rest/v1/',
+  'https://zhivpkjrgobfwzvcclnb.supabase.co',
   'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
 );
 
@@ -133,10 +132,8 @@ export default function App(){
       }]);
 
     if(error){
-
       alert(error.message);
       return;
-
     }
 
     setPreview(false);
@@ -203,7 +200,8 @@ export default function App(){
           padding:'35px',
           borderRadius:'28px',
           color:'#fff',
-          marginBottom:'24px'
+          marginBottom:'24px',
+          boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
         }}>
 
           <div style={{
@@ -326,6 +324,7 @@ export default function App(){
                 ...f,
                 score:e.target.value
               })}
+              placeholder='0.0 - 5.0'
               style={inputStyle}
             />
 
@@ -695,8 +694,9 @@ const thStyle = {
   textAlign:'center'
 };
 
-const tdStyle = { 
-padding:'14px', 
-borderBottom:'1px solid #f1f5f9', 
-textAlign:'center' 
+const tdStyle = {
+  padding:'14px',
+  borderBottom:'1px solid #f1f5f9',
+  textAlign:'center'
 };
+
