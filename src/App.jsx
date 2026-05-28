@@ -3,8 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   'https://zhivpkjrgobfwzvcclnb.supabase.co',
-  'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
+  'PUT_YOUR_PUBLISHABLE_KEY'
 );
+
 const teams = [
   'กฟน.1','กฟน.2','กฟน.3',
   'กฟฉ.1','กฟฉ.2','กฟฉ.3',
@@ -13,6 +14,7 @@ const teams = [
 ];
 
 const judges = [
+
   {name:'นางนงลักษณ์ สุวรรณจำรัส',role:'ประธาน'},
   {name:'นายภักพงษ์ วงษ์พันธุ์ทา',role:'กรรมการ'},
   {name:'นายชิดชัย เพชรแก้วสุข',role:'กรรมการ'},
@@ -25,31 +27,48 @@ const judges = [
   {name:'นายภาสกร วิชชาบูรณ์ดำรง',role:'กรรมการ'},
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
-  {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'}
+  {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
+
+  {name:'โสภณ อินทโชติ',role:'ผู้ช่วยกรรมการ'},
+  {name:'อิสริยะ เย็นทรวง',role:'ผู้ช่วยกรรมการ'}
+
 ];
 
-const categories = [
-  {
-    key:'onsite',
-    label:'คะแนนตรวจประเมิน ณ กฟฟ. หน้างาน'
-  },
-  {
-    key:'theory',
-    label:'คะแนนภาคทฤษฎี'
-  },
-  {
-    key:'fieldwork',
-    label:'คะแนนแข่งภาคสนาม'
-  },
-  {
-    key:'presentation',
-    label:'คะแนนการนำเสนอผลงาน'
-  }
+const assistantJudges = [
+  'โสภณ อินทโชติ',
+  'อิสริยะ เย็นทรวง'
 ];
 
 const adminUsers = [
-  'โสภณ อินทโชติ',
-  'อิสริยะ เย็นทรวง'
+  'นางนงลักษณ์ สุวรรณจำรัส'
+];
+
+const categories = [
+
+  {
+    key:'onsite',
+    label:'คะแนนตรวจประเมิน ณ กฟฟ. หน้างาน',
+    type:'main'
+  },
+
+  {
+    key:'presentation',
+    label:'คะแนนการนำเสนอผลงาน',
+    type:'main'
+  },
+
+  {
+    key:'theory',
+    label:'คะแนนภาคทฤษฎี',
+    type:'assistant'
+  },
+
+  {
+    key:'fieldwork',
+    label:'คะแนนแข่งภาคสนาม',
+    type:'assistant'
+  }
+
 ];
 
 export default function App(){
@@ -58,8 +77,9 @@ export default function App(){
   const [preview,setPreview] = useState(false);
 
   const [user,setUser] = useState(judges[0].name);
+
   const [adminPass,setAdminPass] = useState('');
-const [adminLogged,setAdminLogged] = useState(false);
+  const [adminLogged,setAdminLogged] = useState(false);
 
   const [f,setF] = useState({
     team:teams[0],
@@ -69,16 +89,20 @@ const [adminLogged,setAdminLogged] = useState(false);
   });
 
   const current = judges.find(j=>j.name===user);
+
   const filteredCategories = categories.filter(c => {
-  if(c.assistantOnly){
-    return assistantJudges.includes(user);
-  }
-  return true;
-});
+
+    if(assistantJudges.includes(user)){
+      return c.type === 'assistant';
+    }
+
+    return c.type === 'main';
+
+  });
 
   const isAdmin =
-  adminUsers.includes(user) &&
-  adminLogged;
+    adminUsers.includes(user) &&
+    adminLogged;
 
   useEffect(()=>{
     loadScores();
@@ -108,20 +132,27 @@ const [adminLogged,setAdminLogged] = useState(false);
 
     if(!f.signed || exists) return;
 
-    await supabase.from('scores').insert([{
-      team:f.team,
-      judge:user,
-      role:current.role,
-      category:f.category,
-      score:Number(f.score||0),
-      created_at:new Date()
-    }]);
+    const { error } = await supabase
+      .from('scores')
+      .insert([{
+        team:f.team,
+        judge:user,
+        role:current.role,
+        category:f.category,
+        score:Number(f.score||0),
+        created_at:new Date()
+      }]);
+
+    if(error){
+      alert('เกิดข้อผิดพลาด');
+      return;
+    }
 
     setPreview(false);
 
     setF({
       team:teams[0],
-      category:'onsite',
+      category:filteredCategories[0].key,
       score:'',
       signed:false
     });
@@ -164,7 +195,7 @@ const [adminLogged,setAdminLogged] = useState(false);
 
     <div style={{
       minHeight:'100vh',
-      background:'linear-gradient(135deg,#dbeafe,#eff6ff,#ffffff)',
+      background:'linear-gradient(135deg,#dbeafe,#f0f9ff,#ffffff)',
       padding:'24px',
       fontFamily:'sans-serif'
     }}>
@@ -174,35 +205,29 @@ const [adminLogged,setAdminLogged] = useState(false);
         margin:'0 auto'
       }}>
 
-        {/* HEADER */}
-
         <div style={{
           background:'linear-gradient(90deg,#2563eb,#06b6d4)',
           padding:'35px',
           borderRadius:'28px',
           color:'#fff',
-          marginBottom:'25px',
-          boxShadow:'0 10px 30px rgba(0,0,0,0.15)'
+          marginBottom:'24px'
         }}>
 
           <div style={{
-            fontSize:'40px',
-            fontWeight:'bold',
-            marginBottom:'10px'
+            fontSize:'38px',
+            fontWeight:'bold'
           }}>
             🏆 ระบบลงคะแนนการแข่งขัน
           </div>
 
           <div style={{
-            fontSize:'22px',
-            opacity:0.95
+            marginTop:'10px',
+            fontSize:'20px'
           }}>
             การปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
           </div>
 
         </div>
-
-        {/* CONTENT */}
 
         <div style={{
           display:'grid',
@@ -210,134 +235,125 @@ const [adminLogged,setAdminLogged] = useState(false);
           gap:'20px'
         }}>
 
-          {/* FORM */}
+          <div style={cardStyle}>
 
-          <div style={{
-            background:'#fff',
-            borderRadius:'24px',
-            padding:'24px',
-            boxShadow:'0 10px 25px rgba(0,0,0,0.08)'
-          }}>
-
-            <h2 style={{
-              marginBottom:'20px',
-              fontSize:'24px'
-            }}>
+            <h2 style={titleStyle}>
               👨‍⚖️ แบบฟอร์มลงคะแนน
             </h2>
 
-            {/* JUDGE */}
-
-            <div style={{marginBottom:'18px'}}>
-
-              <div style={labelStyle}>
-                เลือกกรรมการ
-              </div>
-
-              <select
-                value={user}
-                onChange={e=>setUser(e.target.value)}
-                style={inputStyle}
-              >
-                {judges.map(j=>(
-                  <option key={j.name}>
-                    {j.name}
-                  </option>
-                ))}
-              </select>
-
+            <div style={labelStyle}>
+              เลือกกรรมการ
             </div>
 
+            <select
+              value={user}
+              onChange={e=>{
+
+                setUser(e.target.value);
+
+                const isAssistant =
+                  assistantJudges.includes(
+                    e.target.value
+                  );
+
+                setF({
+                  ...f,
+                  category:isAssistant
+                    ? 'theory'
+                    : 'onsite'
+                });
+
+                setAdminLogged(false);
+
+              }}
+              style={inputStyle}
+            >
+
+              {judges.map(j=>(
+                <option key={j.name}>
+                  {j.name}
+                </option>
+              ))}
+
+            </select>
+
             <div style={{
+              marginTop:'12px',
               background:'#eff6ff',
               padding:'12px',
-              borderRadius:'14px',
-              marginBottom:'20px'
+              borderRadius:'12px'
             }}>
               ตำแหน่ง: {current.role}
             </div>
 
-            {/* TEAM */}
-
-            <div style={{marginBottom:'18px'}}>
-
-              <div style={labelStyle}>
-                เลือกทีมแข่งขัน
-              </div>
-
-              <select
-                value={f.team}
-                onChange={e=>setF({
-                  ...f,
-                  team:e.target.value
-                })}
-                style={inputStyle}
-              >
-                {teams.map(t=>(
-                  <option key={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-
+            <div style={labelStyle}>
+              ทีมแข่งขัน
             </div>
 
-            {/* CATEGORY */}
+            <select
+              value={f.team}
+              onChange={e=>setF({
+                ...f,
+                team:e.target.value
+              })}
+              style={inputStyle}
+            >
 
-            <div style={{marginBottom:'18px'}}>
+              {teams.map(t=>(
+                <option key={t}>
+                  {t}
+                </option>
+              ))}
 
-              <div style={labelStyle}>
-                เลือกประเภทคะแนน
-              </div>
+            </select>
 
-              <select
-                value={f.category}
-                onChange={e=>setF({
-                  ...f,
-                  category:e.target.value
-                })}
-                style={inputStyle}
-              >
-                {filteredCategories.map(c=>(
-                  <option
-                    key={c.key}
-                    value={c.key}
-                  >
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-
+            <div style={labelStyle}>
+              ประเภทคะแนน
             </div>
 
-            {/* SCORE */}
+            <select
+              value={f.category}
+              onChange={e=>setF({
+                ...f,
+                category:e.target.value
+              })}
+              style={inputStyle}
+            >
 
-            <div style={{marginBottom:'18px'}}>
+              {filteredCategories.map(c=>(
 
-              <div style={labelStyle}>
-                คะแนน (0 - 5)
-              </div>
+                <option
+                  key={c.key}
+                  value={c.key}
+                >
+                  {c.label}
+                </option>
 
-              <input
-                type='number'
-                min='0'
-                max='5'
-                step='0.1'
-                value={f.score}
-                onChange={e=>setF({
-                  ...f,
-                  score:e.target.value
-                })}
-                placeholder='0.0 - 5.0'
-                style={inputStyle}
-              />
+              ))}
 
+            </select>
+
+            <div style={labelStyle}>
+              คะแนน (0 - 5)
             </div>
+
+            <input
+              type='number'
+              min='0'
+              max='5'
+              step='0.1'
+              value={f.score}
+              onChange={e=>setF({
+                ...f,
+                score:e.target.value
+              })}
+              style={inputStyle}
+            />
 
             <label style={{
               display:'flex',
               gap:'10px',
-              marginTop:'20px'
+              marginTop:'18px'
             }}>
 
               <input
@@ -354,50 +370,29 @@ const [adminLogged,setAdminLogged] = useState(false);
             </label>
 
             {exists && (
+
               <div style={{
                 color:'red',
-                marginTop:'14px'
+                marginTop:'12px'
               }}>
                 ลงคะแนนประเภทนี้ให้ทีมนี้แล้ว
               </div>
+
             )}
 
             <button
               disabled={!f.signed || exists}
               onClick={()=>setPreview(true)}
-              style={{
-                width:'100%',
-                marginTop:'24px',
-                padding:'16px',
-                border:'none',
-                borderRadius:'18px',
-                background:'linear-gradient(90deg,#2563eb,#06b6d4)',
-                color:'#fff',
-                fontSize:'18px',
-                fontWeight:'bold',
-                cursor:'pointer',
-                opacity:(!f.signed || exists)?0.5:1
-              }}
+              style={buttonStyle}
             >
               ✅ ตรวจสอบก่อนส่งคะแนน
             </button>
 
           </div>
 
-          {/* MY SCORE */}
+          <div style={cardStyle}>
 
-          <div style={{
-            background:'#fff',
-            borderRadius:'24px',
-            padding:'24px',
-            boxShadow:'0 10px 25px rgba(0,0,0,0.08)',
-            overflow:'auto'
-          }}>
-
-            <h2 style={{
-              marginBottom:'20px',
-              fontSize:'24px'
-            }}>
+            <h2 style={titleStyle}>
               📋 คะแนนที่ฉันลงไว้
             </h2>
 
@@ -406,14 +401,18 @@ const [adminLogged,setAdminLogged] = useState(false);
               borderCollapse:'collapse'
             }}>
 
-              <thead style={{
-                background:'#eff6ff'
-              }}>
-                <tr>
+              <thead>
+
+                <tr style={{
+                  background:'#eff6ff'
+                }}>
+
                   <th style={thStyle}>ทีม</th>
-                  <th style={thStyle}>ประเภทคะแนน</th>
+                  <th style={thStyle}>ประเภท</th>
                   <th style={thStyle}>คะแนน</th>
+
                 </tr>
+
               </thead>
 
               <tbody>
@@ -449,49 +448,56 @@ const [adminLogged,setAdminLogged] = useState(false);
           </div>
 
         </div>
-{adminUsers.includes(user) && !adminLogged && (
 
-  <div style={{
-    marginTop:'24px',
-    background:'#fff',
-    padding:'24px',
-    borderRadius:'24px'
-  }}>
+        {adminUsers.includes(user) &&
+         !adminLogged && (
 
-    <h2>🔐 เข้าสู่ระบบผู้มีสิทธิ์</h2>
+          <div style={{
+            marginTop:'24px',
+            background:'#fff',
+            padding:'24px',
+            borderRadius:'24px'
+          }}>
 
-    <input
-      type='password'
-      placeholder='รหัสผ่าน'
-      value={adminPass}
-      onChange={e=>setAdminPass(e.target.value)}
-      style={inputStyle}
-    />
+            <h2>
+              🔐 เข้าสู่ระบบผู้มีสิทธิ์
+            </h2>
 
-    <button
-      onClick={()=>{
-        if(adminPass==='pea1234'){
-          setAdminLogged(true);
-        }else{
-          alert('รหัสผ่านไม่ถูกต้อง');
-        }
-      }}
-      style={{
-        marginTop:'12px',
-        padding:'12px 20px',
-        border:'none',
-        borderRadius:'12px',
-        background:'#2563eb',
-        color:'#fff'
-      }}
-    >
-      Login
-    </button>
+            <input
+              type='password'
+              placeholder='รหัสผ่าน'
+              value={adminPass}
+              onChange={e=>
+                setAdminPass(e.target.value)
+              }
+              style={inputStyle}
+            />
 
-  </div>
+            <button
+              onClick={()=>{
 
-)}
-        {/* ADMIN ONLY */}
+                if(adminPass==='peawsc2026'){
+                  setAdminLogged(true);
+                }else{
+                  alert('รหัสผ่านไม่ถูกต้อง');
+                }
+
+              }}
+              style={{
+                marginTop:'14px',
+                padding:'12px 18px',
+                border:'none',
+                borderRadius:'12px',
+                background:'#2563eb',
+                color:'#fff'
+              }}
+            >
+              Login
+            </button>
+
+          </div>
+
+        )}
 
         {isAdmin && (
 
@@ -499,16 +505,11 @@ const [adminLogged,setAdminLogged] = useState(false);
             marginTop:'24px',
             background:'#fff',
             borderRadius:'24px',
-            padding:'24px',
-            boxShadow:'0 10px 25px rgba(0,0,0,0.08)',
-            overflow:'auto'
+            padding:'24px'
           }}>
 
-            <h2 style={{
-              marginBottom:'20px',
-              fontSize:'24px'
-            }}>
-              🔒 ตารางคะแนนรวม (เฉพาะผู้มีสิทธิ์)
+            <h2 style={titleStyle}>
+              🔒 ตารางคะแนนรวม
             </h2>
 
             <table style={{
@@ -516,16 +517,17 @@ const [adminLogged,setAdminLogged] = useState(false);
               borderCollapse:'collapse'
             }}>
 
-              <thead style={{
-                background:'#eff6ff'
-              }}>
+              <thead>
 
-                <tr>
+                <tr style={{
+                  background:'#eff6ff'
+                }}>
+
                   <th style={thStyle}>อันดับ</th>
                   <th style={thStyle}>ทีม</th>
                   <th style={thStyle}>คะแนนรวม</th>
                   <th style={thStyle}>คะแนนเฉลี่ย</th>
-                  <th style={thStyle}>จำนวนคะแนน</th>
+
                 </tr>
 
               </thead>
@@ -541,7 +543,7 @@ const [adminLogged,setAdminLogged] = useState(false);
                     </td>
 
                     <td style={tdStyle}>
-                      <b>{r.team}</b>
+                      {r.team}
                     </td>
 
                     <td style={tdStyle}>
@@ -550,10 +552,6 @@ const [adminLogged,setAdminLogged] = useState(false);
 
                     <td style={tdStyle}>
                       {r.avg}
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.count}
                     </td>
 
                   </tr>
@@ -570,8 +568,6 @@ const [adminLogged,setAdminLogged] = useState(false);
 
       </div>
 
-      {/* POPUP */}
-
       {preview && (
 
         <div style={{
@@ -580,27 +576,23 @@ const [adminLogged,setAdminLogged] = useState(false);
           background:'rgba(0,0,0,0.5)',
           display:'flex',
           justifyContent:'center',
-          alignItems:'center',
-          zIndex:999
+          alignItems:'center'
         }}>
 
           <div style={{
             background:'#fff',
             padding:'30px',
             borderRadius:'24px',
-            width:'450px',
-            maxWidth:'95%'
+            width:'420px'
           }}>
 
-            <h2 style={{
-              marginBottom:'20px',
-              fontSize:'28px'
-            }}>
-              🔍 ตรวจสอบคะแนนก่อนส่ง
+            <h2>
+              🔍 ตรวจสอบก่อนส่ง
             </h2>
 
             <div style={{
-              lineHeight:'2.2'
+              marginTop:'20px',
+              lineHeight:'2'
             }}>
 
               <div>
@@ -624,7 +616,7 @@ const [adminLogged,setAdminLogged] = useState(false);
 
             <div style={{
               display:'flex',
-              gap:'12px',
+              gap:'10px',
               marginTop:'24px'
             }}>
 
@@ -634,9 +626,7 @@ const [adminLogged,setAdminLogged] = useState(false);
                   flex:1,
                   padding:'14px',
                   border:'none',
-                  borderRadius:'14px',
-                  background:'#cbd5e1',
-                  fontWeight:'bold'
+                  borderRadius:'12px'
                 }}
               >
                 ย้อนกลับ
@@ -648,13 +638,12 @@ const [adminLogged,setAdminLogged] = useState(false);
                   flex:1,
                   padding:'14px',
                   border:'none',
-                  borderRadius:'14px',
-                  background:'linear-gradient(90deg,#2563eb,#06b6d4)',
-                  color:'#fff',
-                  fontWeight:'bold'
+                  borderRadius:'12px',
+                  background:'#2563eb',
+                  color:'#fff'
                 }}
               >
-                ✅ ยืนยันส่งคะแนน
+                ยืนยันส่งคะแนน
               </button>
 
             </div>
@@ -671,7 +660,20 @@ const [adminLogged,setAdminLogged] = useState(false);
 
 }
 
+const cardStyle = {
+  background:'#fff',
+  borderRadius:'24px',
+  padding:'24px',
+  boxShadow:'0 10px 25px rgba(0,0,0,0.08)'
+};
+
+const titleStyle = {
+  marginBottom:'20px',
+  fontSize:'24px'
+};
+
 const labelStyle = {
+  marginTop:'16px',
   marginBottom:'8px',
   fontWeight:'bold'
 };
@@ -684,10 +686,21 @@ const inputStyle = {
   fontSize:'16px'
 };
 
+const buttonStyle = {
+  width:'100%',
+  marginTop:'24px',
+  padding:'16px',
+  border:'none',
+  borderRadius:'18px',
+  background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+  color:'#fff',
+  fontWeight:'bold',
+  fontSize:'18px'
+};
+
 const thStyle = {
   padding:'14px',
-  borderBottom:'1px solid #e2e8f0',
-  textAlign:'center'
+  borderBottom:'1px solid #e2e8f0'
 };
 
 const tdStyle = {
