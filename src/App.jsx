@@ -48,7 +48,8 @@ const categories = [
 ];
 
 const adminUsers = [
-  'นางนงลักษณ์ สุวรรณจำรัส'
+  'โสภณ อินทโชติ',
+  'อิสริยะ เย็นทรวง'
 ];
 
 export default function App(){
@@ -57,6 +58,8 @@ export default function App(){
   const [preview,setPreview] = useState(false);
 
   const [user,setUser] = useState(judges[0].name);
+  const [adminPass,setAdminPass] = useState('');
+const [adminLogged,setAdminLogged] = useState(false);
 
   const [f,setF] = useState({
     team:teams[0],
@@ -66,8 +69,16 @@ export default function App(){
   });
 
   const current = judges.find(j=>j.name===user);
+  const filteredCategories = categories.filter(c => {
+  if(c.assistantOnly){
+    return assistantJudges.includes(user);
+  }
+  return true;
+});
 
-  const isAdmin = adminUsers.includes(user);
+  const isAdmin =
+  adminUsers.includes(user) &&
+  adminLogged;
 
   useEffect(()=>{
     loadScores();
@@ -287,7 +298,7 @@ export default function App(){
                 })}
                 style={inputStyle}
               >
-                {categories.map(c=>(
+                {filteredCategories.map(c=>(
                   <option
                     key={c.key}
                     value={c.key}
@@ -438,7 +449,48 @@ export default function App(){
           </div>
 
         </div>
+{adminUsers.includes(user) && !adminLogged && (
 
+  <div style={{
+    marginTop:'24px',
+    background:'#fff',
+    padding:'24px',
+    borderRadius:'24px'
+  }}>
+
+    <h2>🔐 เข้าสู่ระบบผู้มีสิทธิ์</h2>
+
+    <input
+      type='password'
+      placeholder='รหัสผ่าน'
+      value={adminPass}
+      onChange={e=>setAdminPass(e.target.value)}
+      style={inputStyle}
+    />
+
+    <button
+      onClick={()=>{
+        if(adminPass==='pea1234'){
+          setAdminLogged(true);
+        }else{
+          alert('รหัสผ่านไม่ถูกต้อง');
+        }
+      }}
+      style={{
+        marginTop:'12px',
+        padding:'12px 20px',
+        border:'none',
+        borderRadius:'12px',
+        background:'#2563eb',
+        color:'#fff'
+      }}
+    >
+      Login
+    </button>
+
+  </div>
+
+)}
         {/* ADMIN ONLY */}
 
         {isAdmin && (
