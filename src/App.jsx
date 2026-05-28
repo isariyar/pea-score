@@ -28,7 +28,8 @@ const judges = [
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
+  {name:'โสภณ อินทโชติ',role:'ผู้ช่วยกรรมการ'},
+  {name:'อิสริยะ เย็นทรวง',role:'ผู้ช่วยกรรมการ'}
 ];
 
 const normalCategories = [
@@ -53,7 +54,7 @@ const assistantCategories = [
   }
 ];
 
-const adminPassword = 'peawsc2026';
+const adminPassword = 'PEAWSC2026';
 
 export default function App(){
 
