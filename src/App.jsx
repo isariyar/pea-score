@@ -58,8 +58,8 @@ export default function App(){
   const [rows,setRows] = useState([]);
   const [preview,setPreview] = useState(false);
 
-  const [adminPass,setAdminPass] = useState('');
-  const [adminLogged,setAdminLogged] = useState(false);
+  const [adminPass,setAdminPass] = useState( localStorage.getItem('pea_admin_pass') || '' );
+  const [adminLogged,setAdminLogged] = useState( localStorage.getItem('pea_admin_login') === 'true' );
 
   const [user,setUser] = useState(judges[0].name);
 
