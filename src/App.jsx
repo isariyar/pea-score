@@ -83,9 +83,7 @@ export default function App(){
 
   const [adminPass,setAdminPass] = useState('');
 
-  const [adminLogged,setAdminLogged] = useState(
-    localStorage.getItem('pea_admin_login') === 'true'
-  );
+  const [adminLogged,setAdminLogged] = useState(false);
 
   const current = judges.find(
     j=>j.name===user
@@ -778,11 +776,6 @@ export default function App(){
                   if(adminPass === 'peawsc2026'){
 
                     setAdminLogged(true);
-
-                    localStorage.setItem(
-                      'pea_admin_login',
-                      'true'
-                    );
 
                   }else{
 
