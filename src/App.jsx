@@ -318,7 +318,7 @@ export default function App(){
             fontSize:'42px',
             fontWeight:'bold'
           }}>
-            🏆 PEAWSC SCORE SYSTEM
+            🏆 Operation and Maintenance Score System 2026 🏆
           </div>
 
           <div style={{
