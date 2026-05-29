@@ -331,10 +331,12 @@ export default function App(){
         thermalAvg;
 
       const presentationTotal =
-        presentationRows.reduce(
-          (a,b)=>a+Number(b.score || 0),
-          0
-        );
+  presentationRows.length
+  ? presentationRows.reduce(
+      (a,b)=>a+Number(b.score || 0),
+      0
+    ) / presentationRows.length
+  : 0;
 
       const theoryTotal =
         theoryRows.reduce(
