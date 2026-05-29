@@ -801,7 +801,7 @@ export default function App(){
               <button
                 onClick={()=>{
 
-                  if(adminPass === 'peawsc2026'){
+                  if(adminPass === 'test2026'){
 
                     setAdminLogged(true);
 
