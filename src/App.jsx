@@ -28,6 +28,8 @@ const judges = [
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
   {name:'ทีมงาน กบร./ ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
+  {name:'test1',role:'test'},
+  {name:'test2',role:'test'},
 ];
 
 const normalCategories = [
