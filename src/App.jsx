@@ -78,12 +78,14 @@ const onsiteTopics = [
 export default function App(){
 
   const [rows,setRows] = useState([]);
-  const [preview,setPreview] = useState(false);
-
-  const [adminPass,setAdminPass] = useState('');
-  const [adminLogged,setAdminLogged] = useState(false);
 
   const [user,setUser] = useState(judges[0].name);
+
+  const [adminPass,setAdminPass] = useState('');
+
+  const [adminLogged,setAdminLogged] = useState(
+    localStorage.getItem('pea_admin_login') === 'true'
+  );
 
   const current = judges.find(
     j=>j.name===user
@@ -99,7 +101,7 @@ export default function App(){
   const [f,setF] = useState({
 
     team:teams[0],
-    category:'onsite',
+    category:categories[0].key,
 
     score:'',
 
@@ -144,15 +146,23 @@ export default function App(){
   }
 
   const exists = rows.some(
+
     r =>
-      r.team===f.team &&
-      r.judge===user &&
-      r.category===f.category
+
+      r.team === f.team &&
+      r.judge === user &&
+      r.category === f.category
+
   );
 
   async function add(){
 
     if(!f.signed){
+      return;
+    }
+
+    if(exists){
+      alert('ลงคะแนนรายการนี้แล้ว');
       return;
     }
 
@@ -224,8 +234,6 @@ export default function App(){
 
     alert('บันทึกคะแนนสำเร็จ');
 
-    setPreview(false);
-
     setF({
 
       team:teams[0],
@@ -279,7 +287,7 @@ export default function App(){
         count:rs.length
       };
 
-    }).sort((a,b)=>b.avg-a.avg);
+    }).sort((a,b)=>b.total-a.total);
 
   },[rows]);
 
@@ -287,36 +295,40 @@ export default function App(){
 
     <div style={{
       minHeight:'100vh',
-      background:'linear-gradient(135deg,#dbeafe,#eff6ff,#ffffff)',
-      padding:'24px',
+      background:'linear-gradient(135deg,#0f172a,#1e3a8a,#0ea5e9)',
+      padding:'30px',
       fontFamily:'sans-serif'
     }}>
 
       <div style={{
-        maxWidth:'1400px',
+        maxWidth:'1500px',
         margin:'0 auto'
       }}>
 
         <div style={{
-          background:'linear-gradient(90deg,#2563eb,#06b6d4)',
+          background:'rgba(255,255,255,0.12)',
+          backdropFilter:'blur(12px)',
+          border:'1px solid rgba(255,255,255,0.15)',
+          borderRadius:'30px',
           padding:'35px',
-          borderRadius:'28px',
           color:'#fff',
-          marginBottom:'24px'
+          marginBottom:'25px',
+          boxShadow:'0 15px 35px rgba(0,0,0,0.25)'
         }}>
 
           <div style={{
-            fontSize:'40px',
+            fontSize:'42px',
             fontWeight:'bold'
           }}>
             🏆 PEAWSC SCORE SYSTEM
           </div>
 
           <div style={{
+            marginTop:'10px',
             fontSize:'22px',
-            marginTop:'10px'
+            opacity:0.95
           }}>
-            ระบบลงคะแนนการแข่งขันหัวข้อการปฏิบัติการและบํารุงรักษาระบบไฟฟ้า
+            ระบบลงคะแนนการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
           </div>
 
         </div>
@@ -324,7 +336,7 @@ export default function App(){
         <div style={{
           display:'grid',
           gridTemplateColumns:'1fr 1fr',
-          gap:'24px'
+          gap:'25px'
         }}>
 
           <div style={cardStyle}>
@@ -353,12 +365,7 @@ export default function App(){
 
             </select>
 
-            <div style={{
-              marginTop:'12px',
-              background:'#eff6ff',
-              padding:'12px',
-              borderRadius:'14px'
-            }}>
+            <div style={badgeStyle}>
               ตำแหน่ง: {current.role}
             </div>
 
@@ -454,7 +461,7 @@ export default function App(){
 
                 ))}
 
-                <div style={totalStyle}>
+                <div style={totalBoxStyle}>
 
                   รวมคะแนน:
 
@@ -576,7 +583,7 @@ export default function App(){
                   style={inputStyle}
                 />
 
-                <div style={totalStyle}>
+                <div style={totalBoxStyle}>
 
                   รวมคะแนน:
 
@@ -626,8 +633,10 @@ export default function App(){
 
             <label style={{
               display:'flex',
+              alignItems:'center',
               gap:'10px',
-              marginTop:'20px'
+              marginTop:'20px',
+              fontWeight:'bold'
             }}>
 
               <input
@@ -643,9 +652,28 @@ export default function App(){
 
             </label>
 
+            {exists && (
+
+              <div style={{
+                marginTop:'15px',
+                color:'#dc2626',
+                fontWeight:'bold'
+              }}>
+                ⚠ ลงคะแนนรายการนี้แล้ว
+              </div>
+
+            )}
+
             <button
+              disabled={!f.signed || exists}
               onClick={add}
-              style={buttonStyle}
+              style={{
+                ...buttonStyle,
+                opacity:
+                  (!f.signed || exists)
+                  ? 0.5
+                  : 1
+              }}
             >
               ✅ ส่งคะแนน
             </button>
@@ -658,60 +686,196 @@ export default function App(){
               📋 คะแนนที่ฉันลงไว้
             </div>
 
-            <table style={{
-              width:'100%',
-              borderCollapse:'collapse'
+            <div style={{
+              overflow:'auto'
             }}>
 
-              <thead>
+              <table style={{
+                width:'100%',
+                borderCollapse:'collapse'
+              }}>
 
-                <tr style={{
-                  background:'#eff6ff'
-                }}>
+                <thead>
 
-                  <th style={thStyle}>
-                    ทีม
-                  </th>
+                  <tr style={{
+                    background:'#eff6ff'
+                  }}>
 
-                  <th style={thStyle}>
-                    ประเภท
-                  </th>
+                    <th style={thStyle}>
+                      ทีม
+                    </th>
 
-                  <th style={thStyle}>
-                    คะแนน
-                  </th>
+                    <th style={thStyle}>
+                      ประเภท
+                    </th>
 
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {myRows.map((r,i)=>(
-
-                  <tr key={i}>
-
-                    <td style={tdStyle}>
-                      {r.team}
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.category}
-                    </td>
-
-                    <td style={tdStyle}>
-                      {r.score}
-                    </td>
+                    <th style={thStyle}>
+                      คะแนน
+                    </th>
 
                   </tr>
 
-                ))}
+                </thead>
 
-              </tbody>
+                <tbody>
 
-            </table>
+                  {myRows.map((r,i)=>(
+
+                    <tr key={i}>
+
+                      <td style={tdStyle}>
+                        {r.team}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.category}
+                      </td>
+
+                      <td style={tdStyle}>
+                        <b>{r.score}</b>
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
 
           </div>
+
+        </div>
+
+        <div style={{
+          ...cardStyle,
+          marginTop:'25px'
+        }}>
+
+          <div style={titleStyle}>
+            🔒 ตารางคะแนนรวม
+          </div>
+
+          {!adminLogged ? (
+
+            <>
+
+              <input
+                type='password'
+                placeholder='กรอกรหัสผ่าน'
+                value={adminPass}
+                onChange={e=>setAdminPass(
+                  e.target.value
+                )}
+                style={inputStyle}
+              />
+
+              <button
+                onClick={()=>{
+
+                  if(adminPass === 'peawsc2026'){
+
+                    setAdminLogged(true);
+
+                    localStorage.setItem(
+                      'pea_admin_login',
+                      'true'
+                    );
+
+                  }else{
+
+                    alert('รหัสผ่านไม่ถูกต้อง');
+
+                  }
+
+                }}
+                style={buttonStyle}
+              >
+                Login
+              </button>
+
+            </>
+
+          ) : (
+
+            <div style={{
+              overflow:'auto'
+            }}>
+
+              <table style={{
+                width:'100%',
+                borderCollapse:'collapse'
+              }}>
+
+                <thead>
+
+                  <tr style={{
+                    background:'#eff6ff'
+                  }}>
+
+                    <th style={thStyle}>
+                      อันดับ
+                    </th>
+
+                    <th style={thStyle}>
+                      ทีม
+                    </th>
+
+                    <th style={thStyle}>
+                      คะแนนรวม
+                    </th>
+
+                    <th style={thStyle}>
+                      คะแนนเฉลี่ย
+                    </th>
+
+                    <th style={thStyle}>
+                      จำนวนคะแนน
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+
+                  {ranking.map((r,i)=>(
+
+                    <tr key={i}>
+
+                      <td style={tdStyle}>
+                        {i+1}
+                      </td>
+
+                      <td style={tdStyle}>
+                        <b>{r.team}</b>
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.total}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.avg}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.count}
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          )}
 
         </div>
 
@@ -724,40 +888,34 @@ export default function App(){
 }
 
 const cardStyle = {
-  background:'#fff',
-  borderRadius:'24px',
-  padding:'24px',
-  boxShadow:'0 10px 25px rgba(0,0,0,0.08)'
+  background:'#ffffff',
+  borderRadius:'28px',
+  padding:'25px',
+  boxShadow:'0 12px 30px rgba(0,0,0,0.12)'
 };
 
 const titleStyle = {
   marginBottom:'20px',
-  fontSize:'24px',
-  fontWeight:'bold'
+  fontSize:'28px',
+  fontWeight:'bold',
+  color:'#1e293b'
 };
 
 const labelStyle = {
   marginTop:'16px',
   marginBottom:'8px',
-  fontWeight:'bold'
+  fontWeight:'bold',
+  color:'#334155'
 };
 
 const inputStyle = {
   width:'100%',
   padding:'14px',
-  borderRadius:'14px',
+  borderRadius:'16px',
   border:'1px solid #cbd5e1',
   fontSize:'16px',
-  boxSizing:'border-box'
-};
-
-const totalStyle = {
-  marginTop:'20px',
-  background:'#eff6ff',
-  padding:'16px',
-  borderRadius:'14px',
-  fontWeight:'bold',
-  fontSize:'20px'
+  boxSizing:'border-box',
+  outline:'none'
 };
 
 const buttonStyle = {
@@ -770,17 +928,39 @@ const buttonStyle = {
   color:'#fff',
   fontWeight:'bold',
   fontSize:'18px',
-  cursor:'pointer'
+  cursor:'pointer',
+  boxShadow:'0 10px 20px rgba(37,99,235,0.25)'
 };
 
 const thStyle = {
   padding:'14px',
   borderBottom:'1px solid #e2e8f0',
-  textAlign:'center'
+  textAlign:'center',
+  fontWeight:'bold'
 };
 
 const tdStyle = {
   padding:'14px',
   borderBottom:'1px solid #f1f5f9',
   textAlign:'center'
+};
+
+const totalBoxStyle = {
+  marginTop:'20px',
+  background:'#dbeafe',
+  padding:'18px',
+  borderRadius:'16px',
+  fontWeight:'bold',
+  fontSize:'22px',
+  textAlign:'center',
+  color:'#1e3a8a'
+};
+
+const badgeStyle = {
+  marginTop:'12px',
+  background:'#dbeafe',
+  color:'#1e3a8a',
+  padding:'12px',
+  borderRadius:'14px',
+  fontWeight:'bold'
 };
