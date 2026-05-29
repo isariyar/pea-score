@@ -27,7 +27,7 @@ const judges = [
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
+  {name:'ทีมงาน กบร./ ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
 ];
 
 const normalCategories = [
@@ -55,23 +55,23 @@ const assistantCategories = [
 const onsiteTopics = [
   {
     key:'maintenance',
-    label:'1. Maintenance and Improvement'
+    label:'Maintenance and Improvement'
   },
   {
     key:'outage',
-    label:'2. Outage Maintenance'
+    label:'Outage Maintenance'
   },
   {
     key:'patrol',
-    label:'3. Patrol'
+    label:'Patrol'
   },
   {
     key:'arboriculture',
-    label:'4. Arboriculture'
+    label:'Arboriculture'
   },
   {
     key:'thermal',
-    label:'5. Thermal Viewer'
+    label:'Thermal Viewer'
   }
 ];
 
@@ -99,6 +99,7 @@ export default function App(){
   const [f,setF] = useState({
 
     team:teams[0],
+
     category:categories[0].key,
 
     score:'',
@@ -138,7 +139,9 @@ export default function App(){
       .order('id',{ascending:false});
 
     if(!error && data){
+
       setRows(data);
+
     }
 
   }
@@ -156,11 +159,16 @@ export default function App(){
   async function add(){
 
     if(!f.signed){
+
+      alert('กรุณายืนยันการตรวจสอบคะแนน');
+
       return;
     }
 
     if(exists){
-      alert('ลงคะแนนรายการนี้แล้ว');
+
+      alert('รายการนี้ถูกลงคะแนนแล้ว');
+
       return;
     }
 
@@ -200,7 +208,6 @@ export default function App(){
       judge:user,
       role:current.role,
       category:f.category,
-
       score:finalScore,
 
       maintenance:Number(f.maintenance || 0),
@@ -223,9 +230,9 @@ export default function App(){
 
     if(error){
 
-      console.log(error);
-
       alert(error.message);
+
+      console.log(error);
 
       return;
     }
@@ -235,6 +242,7 @@ export default function App(){
     setF({
 
       team:teams[0],
+
       category:categories[0].key,
 
       score:'',
@@ -269,56 +277,138 @@ export default function App(){
         r=>r.team===team
       );
 
-      const total = rs.reduce(
-        (a,b)=>a+Number(b.score || 0),
-        0
+      const onsiteRows = rs.filter(
+        r=>r.category === 'onsite'
       );
 
-      const avg = rs.length
-        ? total / rs.length
+      const presentationRows = rs.filter(
+        r=>r.category === 'presentation'
+      );
+
+      const theoryRows = rs.filter(
+        r=>r.category === 'theory'
+      );
+
+      const fieldworkRows = rs.filter(
+        r=>r.category === 'fieldwork'
+      );
+
+      const maintenanceAvg =
+        onsiteRows.length
+        ? onsiteRows.reduce((a,b)=>a+Number(b.maintenance || 0),0)
+          / onsiteRows.length
         : 0;
 
+      const outageAvg =
+        onsiteRows.length
+        ? onsiteRows.reduce((a,b)=>a+Number(b.outage || 0),0)
+          / onsiteRows.length
+        : 0;
+
+      const patrolAvg =
+        onsiteRows.length
+        ? onsiteRows.reduce((a,b)=>a+Number(b.patrol || 0),0)
+          / onsiteRows.length
+        : 0;
+
+      const arboricultureAvg =
+        onsiteRows.length
+        ? onsiteRows.reduce((a,b)=>a+Number(b.arboriculture || 0),0)
+          / onsiteRows.length
+        : 0;
+
+      const thermalAvg =
+        onsiteRows.length
+        ? onsiteRows.reduce((a,b)=>a+Number(b.thermal || 0),0)
+          / onsiteRows.length
+        : 0;
+
+      const onsiteTotal =
+        maintenanceAvg +
+        outageAvg +
+        patrolAvg +
+        arboricultureAvg +
+        thermalAvg;
+
+      const presentationTotal =
+        presentationRows.reduce(
+          (a,b)=>a+Number(b.score || 0),
+          0
+        );
+
+      const theoryTotal =
+        theoryRows.reduce(
+          (a,b)=>a+Number(b.score || 0),
+          0
+        );
+
+      const fieldworkTotal =
+        fieldworkRows.reduce(
+          (a,b)=>a+Number(b.score || 0),
+          0
+        );
+
+      const grandTotal =
+        onsiteTotal +
+        presentationTotal +
+        theoryTotal +
+        fieldworkTotal;
+
       return {
+
         team,
-        total:+total.toFixed(2),
-        avg:+avg.toFixed(2),
-        count:rs.length
+
+        maintenanceAvg:
+          +maintenanceAvg.toFixed(2),
+
+        outageAvg:
+          +outageAvg.toFixed(2),
+
+        patrolAvg:
+          +patrolAvg.toFixed(2),
+
+        arboricultureAvg:
+          +arboricultureAvg.toFixed(2),
+
+        thermalAvg:
+          +thermalAvg.toFixed(2),
+
+        onsiteTotal:
+          +onsiteTotal.toFixed(2),
+
+        presentationTotal:
+          +presentationTotal.toFixed(2),
+
+        theoryTotal:
+          +theoryTotal.toFixed(2),
+
+        fieldworkTotal:
+          +fieldworkTotal.toFixed(2),
+
+        grandTotal:
+          +grandTotal.toFixed(2)
+
       };
 
-    }).sort((a,b)=>b.total-a.total);
+    }).sort(
+      (a,b)=>b.grandTotal-a.grandTotal
+    );
 
   },[rows]);
 
   return (
 
-    <div style={{
-      minHeight:'100vh',
-      background:'linear-gradient(135deg,#0f172a,#1e3a8a,#0ea5e9)',
-      padding:'30px',
-      fontFamily:'sans-serif'
-    }}>
+    <div style={pageStyle}>
 
-      <div style={{
-        maxWidth:'1500px',
-        margin:'0 auto'
-      }}>
+      <div style={containerStyle}>
 
-        <div style={{
-          background:'rgba(255,255,255,0.12)',
-          backdropFilter:'blur(12px)',
-          border:'1px solid rgba(255,255,255,0.15)',
-          borderRadius:'30px',
-          padding:'35px',
-          color:'#fff',
-          marginBottom:'25px',
-          boxShadow:'0 15px 35px rgba(0,0,0,0.25)'
-        }}>
+        <div style={heroStyle}>
 
           <div style={{
             fontSize:'42px',
             fontWeight:'bold'
           }}>
-            🏆 Operation and Maintenance Score System 2026 🏆
+            ⚡ Operation and Maintenance Score System 🏆
           </div>
 
           <div style={{
@@ -331,11 +421,7 @@ export default function App(){
 
         </div>
 
-        <div style={{
-          display:'grid',
-          gridTemplateColumns:'1fr 1fr',
-          gap:'25px'
-        }}>
+        <div style={gridStyle}>
 
           <div style={cardStyle}>
 
@@ -344,7 +430,7 @@ export default function App(){
             </div>
 
             <div style={labelStyle}>
-              เลือกกรรมการ
+              กรรมการ
             </div>
 
             <select
@@ -364,7 +450,7 @@ export default function App(){
             </select>
 
             <div style={badgeStyle}>
-              ตำแหน่ง: {current.role}
+              {current.role}
             </div>
 
             <div style={labelStyle}>
@@ -416,16 +502,15 @@ export default function App(){
 
             </select>
 
-            {f.category === 'onsite' ? (
+            {f.category === 'onsite' && (
 
               <>
-
                 {onsiteTopics.map(topic=>(
 
                   <div key={topic.key}>
 
                     <div style={labelStyle}>
-                      {topic.label} (0 - 12)
+                      {topic.label} (0-12)
                     </div>
 
                     <input
@@ -459,183 +544,129 @@ export default function App(){
 
                 ))}
 
-                <div style={totalBoxStyle}>
+                <div style={scoreBoxStyle}>
 
-                  รวมคะแนน:
+                  รวมคะแนน
 
-                  {' '}
+                  <div style={{
+                    fontSize:'32px',
+                    marginTop:'10px'
+                  }}>
+                    {
 
-                  {
+                      (
+                        Number(f.maintenance || 0) +
+                        Number(f.outage || 0) +
+                        Number(f.patrol || 0) +
+                        Number(f.arboriculture || 0) +
+                        Number(f.thermal || 0)
 
-                    (
-                      Number(f.maintenance || 0) +
-                      Number(f.outage || 0) +
-                      Number(f.patrol || 0) +
-                      Number(f.arboriculture || 0) +
-                      Number(f.thermal || 0)
+                      ).toFixed(1)
 
-                    ).toFixed(1)
-
-                  }
-
-                  / 60
-
-                </div>
-
-              </>
-
-            ) : f.category === 'presentation' ? (
-
-              <>
-
-                <div style={labelStyle}>
-                  1. ตรวจสอบสิ่งผิดปกติ (0 - 5)
-                </div>
-
-                <input
-                  type='number'
-                  min='0'
-                  max='5'
-                  step='0.1'
-                  value={f.presentation_check}
-                  onChange={e=>{
-
-                    let value = Number(e.target.value);
-
-                    if(value > 5){
-                      value = 5;
                     }
 
-                    if(value < 0){
-                      value = 0;
-                    }
+                    / 60
 
-                    setF({
-                      ...f,
-                      presentation_check:value
-                    });
-
-                  }}
-                  style={inputStyle}
-                />
-
-                <div style={labelStyle}>
-                  2. การวิเคราะห์และแก้ไข (0 - 5)
-                </div>
-
-                <input
-                  type='number'
-                  min='0'
-                  max='5'
-                  step='0.1'
-                  value={f.presentation_analysis}
-                  onChange={e=>{
-
-                    let value = Number(e.target.value);
-
-                    if(value > 5){
-                      value = 5;
-                    }
-
-                    if(value < 0){
-                      value = 0;
-                    }
-
-                    setF({
-                      ...f,
-                      presentation_analysis:value
-                    });
-
-                  }}
-                  style={inputStyle}
-                />
-
-                <div style={labelStyle}>
-                  3. ถาม-ตอบ (0 - 5)
-                </div>
-
-                <input
-                  type='number'
-                  min='0'
-                  max='5'
-                  step='0.1'
-                  value={f.presentation_qa}
-                  onChange={e=>{
-
-                    let value = Number(e.target.value);
-
-                    if(value > 5){
-                      value = 5;
-                    }
-
-                    if(value < 0){
-                      value = 0;
-                    }
-
-                    setF({
-                      ...f,
-                      presentation_qa:value
-                    });
-
-                  }}
-                  style={inputStyle}
-                />
-
-                <div style={totalBoxStyle}>
-
-                  รวมคะแนน:
-
-                  {' '}
-
-                  {
-
-                    (
-                      Number(f.presentation_check || 0) +
-                      Number(f.presentation_analysis || 0) +
-                      Number(f.presentation_qa || 0)
-
-                    ).toFixed(1)
-
-                  }
-
-                  / 15
+                  </div>
 
                 </div>
-
-              </>
-
-            ) : (
-
-              <>
-
-                <div style={labelStyle}>
-                  คะแนน
-                </div>
-
-                <input
-                  type='number'
-                  min='0'
-                  max='100'
-                  step='0.1'
-                  value={f.score}
-                  onChange={e=>setF({
-                    ...f,
-                    score:e.target.value
-                  })}
-                  style={inputStyle}
-                />
 
               </>
 
             )}
 
-            <label style={{
-              display:'flex',
-              alignItems:'center',
-              gap:'10px',
-              marginTop:'20px',
-              fontWeight:'bold'
-            }}>
+            {f.category === 'presentation' && (
+
+              <>
+
+                <ScoreInput
+                  label='1. ตรวจสอบสิ่งผิดปกติ'
+                  value={f.presentation_check}
+                  max={5}
+                  onChange={value=>setF({
+                    ...f,
+                    presentation_check:value
+                  })}
+                />
+
+                <ScoreInput
+                  label='2. การวิเคราะห์และแก้ไข'
+                  value={f.presentation_analysis}
+                  max={5}
+                  onChange={value=>setF({
+                    ...f,
+                    presentation_analysis:value
+                  })}
+                />
+
+                <ScoreInput
+                  label='3. ถาม-ตอบ'
+                  value={f.presentation_qa}
+                  max={5}
+                  onChange={value=>setF({
+                    ...f,
+                    presentation_qa:value
+                  })}
+                />
+
+                <div style={scoreBoxStyle}>
+
+                  รวมคะแนน
+
+                  <div style={{
+                    fontSize:'32px',
+                    marginTop:'10px'
+                  }}>
+                    {
+
+                      (
+                        Number(f.presentation_check || 0) +
+                        Number(f.presentation_analysis || 0) +
+                        Number(f.presentation_qa || 0)
+
+                      ).toFixed(1)
+
+                    }
+
+                    / 15
+
+                  </div>
+
+                </div>
+
+              </>
+
+            )}
+
+            {f.category === 'theory' && (
+
+              <ScoreInput
+                label='คะแนนภาคทฤษฎี'
+                value={f.score}
+                max={15}
+                onChange={value=>setF({
+                  ...f,
+                  score:value
+                })}
+              />
+
+            )}
+
+            {f.category === 'fieldwork' && (
+
+              <ScoreInput
+                label='คะแนนแข่งภาคสนาม'
+                value={f.score}
+                max={10}
+                onChange={value=>setF({
+                  ...f,
+                  score:value
+                })}
+              />
+
+            )}
+
+            <label style={checkStyle}>
 
               <input
                 type='checkbox'
@@ -653,9 +684,9 @@ export default function App(){
             {exists && (
 
               <div style={{
-                marginTop:'15px',
-                color:'#dc2626',
-                fontWeight:'bold'
+                color:'#ef4444',
+                fontWeight:'bold',
+                marginTop:'15px'
               }}>
                 ⚠ ลงคะแนนรายการนี้แล้ว
               </div>
@@ -673,7 +704,7 @@ export default function App(){
                   : 1
               }}
             >
-              ✅ ส่งคะแนน
+              🚀 ส่งคะแนน
             </button>
 
           </div>
@@ -688,16 +719,11 @@ export default function App(){
               overflow:'auto'
             }}>
 
-              <table style={{
-                width:'100%',
-                borderCollapse:'collapse'
-              }}>
+              <table style={tableStyle}>
 
                 <thead>
 
-                  <tr style={{
-                    background:'#eff6ff'
-                  }}>
+                  <tr style={theadStyle}>
 
                     <th style={thStyle}>
                       ทีม
@@ -786,7 +812,7 @@ export default function App(){
                 }}
                 style={buttonStyle}
               >
-                Login
+                LOGIN
               </button>
 
             </>
@@ -798,35 +824,26 @@ export default function App(){
             }}>
 
               <table style={{
-                width:'100%',
-                borderCollapse:'collapse'
+                ...tableStyle,
+                minWidth:'1400px'
               }}>
 
                 <thead>
 
-                  <tr style={{
-                    background:'#eff6ff'
-                  }}>
+                  <tr style={theadStyle}>
 
-                    <th style={thStyle}>
-                      อันดับ
-                    </th>
-
-                    <th style={thStyle}>
-                      ทีม
-                    </th>
-
-                    <th style={thStyle}>
-                      คะแนนรวม
-                    </th>
-
-                    <th style={thStyle}>
-                      คะแนนเฉลี่ย
-                    </th>
-
-                    <th style={thStyle}>
-                      จำนวนคะแนน
-                    </th>
+                    <th style={thStyle}>อันดับ</th>
+                    <th style={thStyle}>ทีม</th>
+                    <th style={thStyle}>Maintenance</th>
+                    <th style={thStyle}>Outage</th>
+                    <th style={thStyle}>Patrol</th>
+                    <th style={thStyle}>Arboriculture</th>
+                    <th style={thStyle}>Thermal</th>
+                    <th style={thStyle}>รวมหน้างาน</th>
+                    <th style={thStyle}>Presentation</th>
+                    <th style={thStyle}>Theory</th>
+                    <th style={thStyle}>Fieldwork</th>
+                    <th style={thStyle}>Grand Total</th>
 
                   </tr>
 
@@ -847,15 +864,52 @@ export default function App(){
                       </td>
 
                       <td style={tdStyle}>
-                        {r.total}
+                        {r.maintenanceAvg}
                       </td>
 
                       <td style={tdStyle}>
-                        {r.avg}
+                        {r.outageAvg}
                       </td>
 
                       <td style={tdStyle}>
-                        {r.count}
+                        {r.patrolAvg}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.arboricultureAvg}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.thermalAvg}
+                      </td>
+
+                      <td style={{
+                        ...tdStyle,
+                        background:'#dbeafe',
+                        fontWeight:'bold'
+                      }}>
+                        {r.onsiteTotal}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.presentationTotal}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.theoryTotal}
+                      </td>
+
+                      <td style={tdStyle}>
+                        {r.fieldworkTotal}
+                      </td>
+
+                      <td style={{
+                        ...tdStyle,
+                        background:'#dcfce7',
+                        fontWeight:'bold',
+                        fontSize:'18px'
+                      }}>
+                        {r.grandTotal}
                       </td>
 
                     </tr>
@@ -880,18 +934,92 @@ export default function App(){
 
 }
 
+function ScoreInput({
+  label,
+  value,
+  max,
+  onChange
+}){
+
+  return (
+
+    <>
+
+      <div style={labelStyle}>
+        {label} (0-{max})
+      </div>
+
+      <input
+        type='number'
+        min='0'
+        max={max}
+        step='0.1'
+        value={value}
+        onChange={e=>{
+
+          let v = Number(e.target.value);
+
+          if(v > max){
+            v = max;
+          }
+
+          if(v < 0){
+            v = 0;
+          }
+
+          onChange(v);
+
+        }}
+        style={inputStyle}
+      />
+
+    </>
+
+  );
+
+}
+
+const pageStyle = {
+  minHeight:'100vh',
+  background:'linear-gradient(135deg,#020617,#0f172a,#1e3a8a,#0ea5e9)',
+  padding:'30px',
+  fontFamily:'sans-serif'
+};
+
+const containerStyle = {
+  maxWidth:'1600px',
+  margin:'0 auto'
+};
+
+const heroStyle = {
+  background:'rgba(255,255,255,0.1)',
+  border:'1px solid rgba(255,255,255,0.12)',
+  backdropFilter:'blur(14px)',
+  borderRadius:'30px',
+  padding:'35px',
+  color:'#fff',
+  marginBottom:'30px',
+  boxShadow:'0 15px 40px rgba(0,0,0,0.25)'
+};
+
+const gridStyle = {
+  display:'grid',
+  gridTemplateColumns:'1fr 1fr',
+  gap:'25px'
+};
+
 const cardStyle = {
-  background:'#ffffff',
+  background:'rgba(255,255,255,0.97)',
   borderRadius:'28px',
-  padding:'25px',
-  boxShadow:'0 12px 30px rgba(0,0,0,0.12)'
+  padding:'28px',
+  boxShadow:'0 20px 40px rgba(0,0,0,0.15)'
 };
 
 const titleStyle = {
-  marginBottom:'20px',
-  fontSize:'28px',
+  fontSize:'30px',
   fontWeight:'bold',
-  color:'#1e293b'
+  marginBottom:'22px',
+  color:'#0f172a'
 };
 
 const labelStyle = {
@@ -907,13 +1035,12 @@ const inputStyle = {
   borderRadius:'16px',
   border:'1px solid #cbd5e1',
   fontSize:'16px',
-  boxSizing:'border-box',
-  outline:'none'
+  boxSizing:'border-box'
 };
 
 const buttonStyle = {
   width:'100%',
-  marginTop:'24px',
+  marginTop:'25px',
   padding:'16px',
   border:'none',
   borderRadius:'18px',
@@ -922,38 +1049,53 @@ const buttonStyle = {
   fontWeight:'bold',
   fontSize:'18px',
   cursor:'pointer',
-  boxShadow:'0 10px 20px rgba(37,99,235,0.25)'
-};
-
-const thStyle = {
-  padding:'14px',
-  borderBottom:'1px solid #e2e8f0',
-  textAlign:'center',
-  fontWeight:'bold'
-};
-
-const tdStyle = {
-  padding:'14px',
-  borderBottom:'1px solid #f1f5f9',
-  textAlign:'center'
-};
-
-const totalBoxStyle = {
-  marginTop:'20px',
-  background:'#dbeafe',
-  padding:'18px',
-  borderRadius:'16px',
-  fontWeight:'bold',
-  fontSize:'22px',
-  textAlign:'center',
-  color:'#1e3a8a'
+  boxShadow:'0 10px 20px rgba(37,99,235,0.3)'
 };
 
 const badgeStyle = {
   marginTop:'12px',
   background:'#dbeafe',
-  color:'#1e3a8a',
+  color:'#1d4ed8',
   padding:'12px',
   borderRadius:'14px',
   fontWeight:'bold'
+};
+
+const checkStyle = {
+  display:'flex',
+  alignItems:'center',
+  gap:'10px',
+  marginTop:'22px',
+  fontWeight:'bold'
+};
+
+const scoreBoxStyle = {
+  marginTop:'22px',
+  padding:'20px',
+  borderRadius:'20px',
+  background:'linear-gradient(135deg,#2563eb,#06b6d4)',
+  color:'#fff',
+  textAlign:'center',
+  fontWeight:'bold'
+};
+
+const tableStyle = {
+  width:'100%',
+  borderCollapse:'collapse'
+};
+
+const theadStyle = {
+  background:'#eff6ff'
+};
+
+const thStyle = {
+  padding:'14px',
+  textAlign:'center',
+  borderBottom:'1px solid #dbeafe'
+};
+
+const tdStyle = {
+  padding:'14px',
+  textAlign:'center',
+  borderBottom:'1px solid #f1f5f9'
 };
