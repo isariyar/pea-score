@@ -582,7 +582,7 @@ export default function App(){
               <>
 
                 <ScoreInput
-                  label='1. ตรวจสอบสิ่งผิดปกติ'
+                  label='ตรวจสอบสิ่งผิดปกติ'
                   value={f.presentation_check}
                   max={5}
                   onChange={value=>setF({
@@ -592,7 +592,7 @@ export default function App(){
                 />
 
                 <ScoreInput
-                  label='2. การวิเคราะห์และแก้ไข'
+                  label='การวิเคราะห์และแก้ไข'
                   value={f.presentation_analysis}
                   max={5}
                   onChange={value=>setF({
@@ -602,7 +602,7 @@ export default function App(){
                 />
 
                 <ScoreInput
-                  label='3. ถาม-ตอบ'
+                  label='ถาม-ตอบ'
                   value={f.presentation_qa}
                   max={5}
                   onChange={value=>setF({
