@@ -76,7 +76,7 @@ const onsiteTopics = [
   }
 ];
 
-export default function App(){
+  export default function App(){
 
   const [rows,setRows] = useState([]);
 
@@ -85,11 +85,39 @@ export default function App(){
   const [adminPass,setAdminPass] = useState('');
 
   const [adminLogged,setAdminLogged] = useState(false);
+const [loggedIn,setLoggedIn] = useState(false);
+const [loginEmail,setLoginEmail] = useState('');
+const [loginPassword,setLoginPassword]= useState('');
 
   const current = judges.find(
     j=>j.name===user
   );
+function loginJudge(){
 
+  const judge = judges.find(
+    j =>
+      j.email?.toLowerCase() === loginEmail.toLowerCase() &&
+      j.password === loginPassword
+  );
+
+  if(!judge){
+    alert('Email หรือ Password ไม่ถูกต้อง');
+    return;
+  }
+
+  setUser(judge.name);
+  setLoggedIn(true);
+}
+      useEffect(()=>{
+    loadScores();
+  },[]);
+
+  ...
+    <div>
+      ...
+    </div>
+  );
+}
   const isAssistant =
     current.role === 'ผู้ช่วยกรรมการ';
 
@@ -398,7 +426,7 @@ export default function App(){
     );
 
   },[rows]);
-
+if(!loggedIn){
   return (
 
     <div style={pageStyle}>
@@ -436,20 +464,13 @@ export default function App(){
               กรรมการ
             </div>
 
-            <select
-  value={user}
-  onChange={e=>setUser(e.target.value)}
-  style={inputStyle}
->
-  {judges.map(j => (
-    <option
-      key={j.name}
-      value={j.name}
-    >
-      {j.name}
-    </option>
-  ))}
-</select>
+            <div style={badgeStyle}>
+  {user}
+</div>
+
+<div style={badgeStyle}>
+  {current.role}
+</div>
 
             <div style={badgeStyle}>
               {current.role}
