@@ -78,42 +78,46 @@ const onsiteTopics = [
 
   export default function App(){
 
-  const [rows,setRows] = useState([]);
-
-  const [user,setUser] = useState(judges[0].name);
-
-  const [adminPass,setAdminPass] = useState('');
-
-  const [adminLogged,setAdminLogged] = useState(false);
-const [loggedIn,setLoggedIn] = useState(false);
-const [loginEmail,setLoginEmail] = useState('');
-const [loginPassword,setLoginPassword]= useState('');
+  const [loggedIn,setLoggedIn] = useState(false);
 
   const current = judges.find(
-    j=>j.name===user
-  );
-function loginJudge(){
-
-  const judge = judges.find(
-    j =>
-      j.email?.toLowerCase() === loginEmail.toLowerCase() &&
-      j.password === loginPassword
+    j => j.name === user
   );
 
-  if(!judge){
-    alert('Email หรือ Password ไม่ถูกต้อง');
-    return;
+  const isAssistant =
+    current?.role === 'ผู้ช่วยกรรมการ';
+
+  function loginJudge(){
+
+    const judge = judges.find(
+      j =>
+        j.email?.toLowerCase() === loginEmail.toLowerCase() &&
+        j.password === loginPassword
+    );
+
+    if(!judge){
+      alert('Email หรือ Password ไม่ถูกต้อง');
+      return;
+    }
+
+    setUser(judge.name);
+    setLoggedIn(true);
   }
 
-  setUser(judge.name);
-  setLoggedIn(true);
-}
-      useEffect(()=>{
-    loadScores();
-  },[]);
+  if(!loggedIn){
+    return (
+      <div>
+        Login Page
+      </div>
+    );
+  }
+
+  return (
     <div>
+      Main Page
     </div>
   );
+
 }
   const isAssistant =
     current.role === 'ผู้ช่วยกรรมการ';
