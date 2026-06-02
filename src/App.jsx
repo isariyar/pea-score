@@ -27,8 +27,8 @@ const judges = [
   {name:'นางสาวปรายปวีย์ จันทร์วาสน์',email:'praipawee.cha@pea.co.th',password:'test11',role:'กรรมการ'},
   {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',email:'santi.cha@pea.co.th',password:'test12',role:'กรรมการ'},
   {name:'นายอานนท์ รอตรักษา',email:'arnond.rot@pea.co.th',password:'test13',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ ศฝฟ.',email:'baifern.pea@gmail.com',password:'test14'role:'ผู้ช่วยกรรมการ'},
-  {name:'test1',email:'test@gmail.com',password:'test15','role:'test'},
+  {name:'ทีมงาน กบร./ ศฝฟ.',email:'baifern.pea@gmail.com',password:'test14',role:'ผู้ช่วยกรรมการ'},
+  {name:'test1',email:'test@gmail.com',password:'test15',role:'test'},
 ];
 
 const normalCategories = [
