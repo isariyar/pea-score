@@ -111,10 +111,7 @@ function loginJudge(){
       useEffect(()=>{
     loadScores();
   },[]);
-
-  ...
     <div>
-      ...
     </div>
   );
 }
