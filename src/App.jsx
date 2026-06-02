@@ -525,20 +525,32 @@ export default function App(){
                       value={f[topic.key]}
                       onChange={e=>{
 
-                        let value = Number(e.target.value);
+  const value = e.target.value;
 
-                        if(value > 12){
-                          value = 12;
-                        }
+  if(value === ''){
 
-                        if(value < 0){
-                          value = 0;
-                        }
+    setF({
+      ...f,
+      [topic.key]:''
+    });
 
-                        setF({
-                          ...f,
-                          [topic.key]:value
-                        });
+    return;
+  }
+
+  let score = Number(value);
+
+  if(score > 12){
+    score = 12;
+  }
+
+  if(score < 0){
+    score = 0;
+  }
+
+  setF({
+    ...f,
+    [topic.key]:score
+  });
 
                       }}
                       style={inputStyle}
@@ -959,19 +971,26 @@ function ScoreInput({
         max={max}
         step='0.1'
         value={value}
-        onChange={e=>{
+       onChange={e=>{
 
-          let v = Number(e.target.value);
+  const value = e.target.value;
 
-          if(v > max){
-            v = max;
-          }
+  if(value === ''){
+    onChange('');
+    return;
+  }
 
-          if(v < 0){
-            v = 0;
-          }
+  let v = Number(value);
 
-          onChange(v);
+  if(v > max){
+    v = max;
+  }
+
+  if(v < 0){
+    v = 0;
+  }
+
+  onChange(v);
 
         }}
         style={inputStyle}
