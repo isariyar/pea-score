@@ -437,16 +437,19 @@ export default function App(){
             </div>
 
             <select
-
-              {judges.map(j=>(
-
-                <option key={j.name}>
-                  {j.name}
-                </option>
-
-              ))}
-
-            </select>
+  value={user}
+  onChange={e=>setUser(e.target.value)}
+  style={inputStyle}
+>
+  {judges.map(j => (
+    <option
+      key={j.name}
+      value={j.name}
+    >
+      {j.name}
+    </option>
+  ))}
+</select>
 
             <div style={badgeStyle}>
               {current.role}
