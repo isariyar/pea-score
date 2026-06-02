@@ -14,22 +14,21 @@ const teams = [
 ];
 
 const judges = [
-  {name:'นางนงลักษณ์ สุวรรณจำรัส',role:'ประธาน'},
-  {name:'นายภักพงษ์ วงษ์พันธุ์ทา',role:'กรรมการ'},
-  {name:'นายชิดชัย เพชรแก้วสุข',role:'กรรมการ'},
-  {name:'นายวีระศักดิ์ กนกหงส์',role:'กรรมการ'},
-  {name:'นายสุรเดช สุวรรณ',role:'กรรมการ'},
-  {name:'นายยุทธนา ยิ้มประเสริฐ',role:'กรรมการ'},
-  {name:'นายวชิรพล คำเพิ่ม',role:'กรรมการ'},
-  {name:'นายดอน ฉาฉ่ำ',role:'กรรมการ'},
-  {name:'นายกฤษฎา เทพศาสตรา',role:'กรรมการ'},
-  {name:'นายภาสกร วิชชาบูรณ์ดำรง',role:'กรรมการ'},
-  {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
-  {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
-  {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
-  {name:'test1',role:'test'},
-  {name:'test2',role:'test'},
+  {name:'นางนงลักษณ์ สุวรรณจำรัส',email:'nongluk.suv@pea.co.th',password:'test1',role:'ประธาน'},
+  {name:'นายภักพงษ์ วงษ์พันธุ์ทา',email:'pakpong.won@pea.co.th',password:'test2',role:'กรรมการ'},
+  {name:'นายชิดชัย เพชรแก้วสุข',email:'chidchai.phe@pea.co.th',password:'test3',role:'กรรมการ'},
+  {name:'นายวีระศักดิ์ กนกหงส์',email:'weerasak.kan@pea.co.th',password:'test4',role:'กรรมการ'},
+  {name:'นายสุรเดช สุวรรณ',email:'suradet.suw@pea.co.th',password:'test5',role:'กรรมการ'},
+  {name:'นายยุทธนา ยิ้มประเสริฐ',email:'yutthana.yim@pea.co.th',password:'test6',role:'กรรมการ'},
+  {name:'นายวชิรพล คำเพิ่ม',email:'wachirapol.kha@pea.co.th',password:'test7',role:'กรรมการ'},
+  {name:'นายดอน ฉาฉ่ำ',email:'don.cha@pea.co.th',password:'test8',role:'กรรมการ'},
+  {name:'นายกฤษฎา เทพศาสตรา',email:'kritsada.the@pea.co.th',password:'test9',role:'กรรมการ'},
+  {name:'นายภาสกร วิชชาบูรณ์ดำรง',email:'passakorn.wic@pea.co.th',password:'test10',role:'กรรมการ'},
+  {name:'นางสาวปรายปวีย์ จันทร์วาสน์',email:'praipawee.cha@pea.co.th',password:'test11',role:'กรรมการ'},
+  {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',email:'santi.cha@pea.co.th',password:'test12',role:'กรรมการ'},
+  {name:'นายอานนท์ รอตรักษา',email:'arnond.rot@pea.co.th',password:'test13',role:'กรรมการและเลขาฯ'},
+  {name:'ทีมงาน กบร./ ศฝฟ.',email:'baifern.pea@gmail.com',password:'test14'role:'ผู้ช่วยกรรมการ'},
+  {name:'test1',email:'test@gmail.com',password:'test15','role:'test'},
 ];
 
 const normalCategories = [
@@ -438,10 +437,6 @@ export default function App(){
             </div>
 
             <select
-              value={user}
-              onChange={e=>setUser(e.target.value)}
-              style={inputStyle}
-            >
 
               {judges.map(j=>(
 
