@@ -457,6 +457,9 @@ function logoutJudge(){
     >
       Logout
     </button>
+    <div style={{
+  fontSize:'42px',
+  fontWeight:'bold'
           }}>
             ⚡ Operation and Maintenance Score System 🏆
           </div>
