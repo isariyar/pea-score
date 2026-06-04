@@ -457,24 +457,30 @@ function logoutJudge(){
     >
       Logout
     </button>
-    <div style={{
-  fontSize:'42px',
-  fontWeight:'bold'
-          }}>
-            ⚡ Operation and Maintenance Score System 🏆
-          </div>
+    <div style={heroStyle}>
 
-          <div style={{
-            marginTop:'10px',
-            fontSize:'22px',
-            opacity:0.95
-          }}>
-            ระบบลงคะแนนการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
-          </div>
+  <div
+    style={{
+      fontSize:'42px',
+      fontWeight:'bold'
+    }}
+  >
+    ⚡ Operation and Maintenance Score System 🏆
+  </div>
 
-        </div>
+  <div
+    style={{
+      marginTop:'10px',
+      fontSize:'22px',
+      opacity:0.95
+    }}
+  >
+    ระบบลงคะแนนการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
+  </div>
 
-        <div style={gridStyle}>
+</div>
+
+<div style={gridStyle}>
 
           <div style={cardStyle}>
 
