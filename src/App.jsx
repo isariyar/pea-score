@@ -509,7 +509,26 @@ comment:'',
             </select>
 
             {f.category === 'onsite' && (
+<div style={labelStyle}>
+  ข้อเสนอแนะเพิ่มเติม
+</div>
 
+<textarea
+  rows={5}
+  value={f.comment}
+  onChange={(e)=>
+    setF({
+      ...f,
+      comment:e.target.value
+    })
+  }
+  placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
+  style={{
+    ...inputStyle,
+    minHeight:'120px',
+    resize:'vertical'
+  }}
+/>
               <>
                 {onsiteTopics.map(topic=>(
 
@@ -881,7 +900,7 @@ comment:'',
                     <th style={thStyle}>Theory</th>
                     <th style={thStyle}>Fieldwork</th>
                     <th style={thStyle}>Grand Total</th>
-
+<th style={thStyle}>Comment</th>
                   </tr>
 
                 </thead>
@@ -889,7 +908,71 @@ comment:'',
                 <tbody>
 
                   {ranking.map((r,i)=>(
+<div style={{marginTop:'40px'}}>
 
+  <div style={titleStyle}>
+    📝 ความคิดเห็นจากกรรมการ
+  </div>
+
+  <table style={tableStyle}>
+
+    <thead>
+
+      <tr style={theadStyle}>
+
+        <th style={thStyle}>ทีม</th>
+        <th style={thStyle}>กรรมการ</th>
+        <th style={thStyle}>ประเภท</th>
+        <th style={thStyle}>คะแนน</th>
+        <th style={thStyle}>Comment</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+      {rows
+        .filter(r=>r.comment)
+        .map((r,i)=>(
+
+        <tr key={i}>
+
+          <td style={tdStyle}>
+            {r.team}
+          </td>
+
+          <td style={tdStyle}>
+            {r.judge}
+          </td>
+
+          <td style={tdStyle}>
+            {r.category}
+          </td>
+
+          <td style={tdStyle}>
+            {r.score}
+          </td>
+
+          <td
+            style={{
+              ...tdStyle,
+              textAlign:'left',
+              maxWidth:'500px'
+            }}
+          >
+            {r.comment}
+          </td>
+
+        </tr>
+
+      ))}
+
+    </tbody>
+
+  </table>
+
+</div>
                     <tr key={i}>
 
                       <td style={tdStyle}>
