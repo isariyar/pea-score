@@ -211,8 +211,8 @@ const [f,setF] = useState({
       judge:user,
       role:current.role,
       category:f.category,
+      comment:f.comment || '',
       score:finalScore,
-comment:f.comment,
 
       maintenance:Number(f.maintenance || 0),
       outage:Number(f.outage || 0),
@@ -509,6 +509,7 @@ comment:'',
             </select>
 
             {f.category === 'onsite' && (
+       <> 
 <div style={labelStyle}>
   ข้อเสนอแนะเพิ่มเติม
 </div>
@@ -1031,7 +1032,27 @@ comment:'',
                       }}>
                         {r.grandTotal}
                       </td>
-
+<td
+  style={{
+    ...tdStyle,
+    textAlign:'left',
+    minWidth:'350px'
+  }}
+>
+  {rows
+    .filter(
+      x =>
+        x.team === r.team &&
+        x.category === 'onsite' &&
+        x.comment
+    )
+    .map((x,i)=>(
+      <div key={i}>
+        <b>{x.judge}</b> : {x.comment}
+      </div>
+    ))
+  }
+</td>
                     </tr>
 
                   ))}
