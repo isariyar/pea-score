@@ -561,33 +561,39 @@ function logoutJudge(){
 
             </select>
 
-            {f.category === 'onsite' && (
-       <> 
-<div style={labelStyle}>
-  ข้อเสนอแนะเพิ่มเติม
-</div>
+{f.category === 'onsite' && (
+<>
+  <div style={labelStyle}>
+    ข้อเสนอแนะเพิ่มเติม
+  </div>
 
-<textarea
-  rows={5}
-  value={f.comment}
-  onChange={(e)=>
-    setF({
-      ...f,
-      comment:e.target.value
-    })
-  }
-  placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
-  style={{
-    ...inputStyle,
-    minHeight:'120px',
-    resize:'vertical'
-  }}
-/>
-              <>
-                {onsiteTopics.map(topic=>(
+  <textarea
+    rows={5}
+    value={f.comment}
+    onChange={(e)=>
+      setF({
+        ...f,
+        comment:e.target.value
+      })
+    }
+    placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
+    style={{
+      ...inputStyle,
+      minHeight:'120px',
+      resize:'vertical'
+    }}
+  />
 
+  {onsiteTopics.map(topic=>(
                   <div key={topic.key}>
+</div>
+  ))}
 
+  <div style={scoreBoxStyle}>
+    รวมคะแนน
+  </div>
+</>
+)}
                     <div style={labelStyle}>
                       {topic.label} (0-12)
                     </div>
@@ -636,26 +642,7 @@ function logoutJudge(){
                 ))}
 
                 <div style={scoreBoxStyle}>
-<div style={labelStyle}>
-  ข้อเสนอแนะ / Comment
-</div>
 
-<textarea
-  rows={5}
-  value={f.comment}
-  onChange={(e)=>
-    setF({
-      ...f,
-      comment:e.target.value
-    })
-  }
-  placeholder='ระบุข้อสังเกต ข้อดี ข้อควรปรับปรุง'
-  style={{
-    ...inputStyle,
-    minHeight:'120px',
-    resize:'vertical'
-  }}
-/>
                   รวมคะแนน
 
                   <div style={{
