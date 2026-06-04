@@ -560,86 +560,79 @@ function logoutJudge(){
               ))}
 
             </select>
-
 {f.category === 'onsite' && (
-<>
-  <div style={labelStyle}>
-    ข้อเสนอแนะเพิ่มเติม
-  </div>
+  <>
+    <div style={labelStyle}>
+      ข้อเสนอแนะเพิ่มเติม
+    </div>
 
-  <textarea
-    rows={5}
-    value={f.comment}
-    onChange={(e)=>
-      setF({
-        ...f,
-        comment:e.target.value
-      })
-    }
-    placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
-    style={{
-      ...inputStyle,
-      minHeight:'120px',
-      resize:'vertical'
-    }}
-  />
+    <textarea
+      rows={5}
+      value={f.comment || ''}
+      onChange={(e)=>
+        setF({
+          ...f,
+          comment:e.target.value
+        })
+      }
+      placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
+      style={{
+        ...inputStyle,
+        minHeight:'120px',
+        resize:'vertical'
+      }}
+    />
 
-  {onsiteTopics.map(topic=>(
-                  <div key={topic.key}>
-</div>
-  ))}
+    {onsiteTopics.map(topic => (
 
-  <div style={scoreBoxStyle}>
-    รวมคะแนน
-  </div>
-</>
-)}
-                    <div style={labelStyle}>
-                      {topic.label} (0-12)
-                    </div>
+      <div key={topic.key}>
 
-                    <input
-                      type='number'
-                      min='0'
-                      max='12'
-                      step='0.1'
-                      value={f[topic.key]}
-                      onChange={e=>{
+        <div style={labelStyle}>
+          {topic.label} (0-12)
+        </div>
 
-  const value = e.target.value;
+        <input
+          type='number'
+          min='0'
+          max='12'
+          step='0.1'
+          value={f[topic.key]}
+          onChange={e=>{
 
-  if(value === ''){
+            const value = e.target.value;
 
-    setF({
-      ...f,
-      [topic.key]:''
-    });
+            if(value === ''){
 
-    return;
-  }
+              setF({
+                ...f,
+                [topic.key]:''
+              });
 
-  let score = Number(value);
+              return;
+            }
 
-  if(score > 12){
-    score = 12;
-  }
+            let score = Number(value);
 
-  if(score < 0){
-    score = 0;
-  }
+            if(score > 12){
+              score = 12;
+            }
 
-  setF({
-    ...f,
-    [topic.key]:score
-  });
+            if(score < 0){
+              score = 0;
+            }
 
-                      }}
-                      style={inputStyle}
-                    />
+            setF({
+              ...f,
+              [topic.key]:score
+            });
 
-                  </div>
+          }}
+          style={inputStyle}
+        />
 
-                ))}
+      </div>
+
+    ))}
 
 <div style={scoreBoxStyle}>
 
@@ -653,15 +646,13 @@ function logoutJudge(){
   >
     {
       (
-        Number(f.maintenance || 0) +
-        Number(f.outage || 0) +
-        Number(f.patrol || 0) +
-        Number(f.arboriculture || 0) +
-        Number(f.thermal || 0)
+        Number(f.presentation_check || 0) +
+        Number(f.presentation_analysis || 0) +
+        Number(f.presentation_qa || 0)
       ).toFixed(1)
     }
 
-    / 60
+    / 15
 
   </div>
 
@@ -669,10 +660,6 @@ function logoutJudge(){
 
 </>
 )}
-
-            {f.category === 'presentation' && (
-
-              <>
 
                 <ScoreInput
                   label='ตรวจสอบสิ่งผิดปกติ'
@@ -707,19 +694,18 @@ function logoutJudge(){
 
   รวมคะแนน
 
-  <div style={{
-    fontSize:'32px',
-    marginTop:'10px'
-  }}>
+  <div
+    style={{
+      fontSize:'32px',
+      marginTop:'10px'
+    }}
+  >
     {
-
       (
         Number(f.presentation_check || 0) +
         Number(f.presentation_analysis || 0) +
         Number(f.presentation_qa || 0)
-
       ).toFixed(1)
-
     }
 
     / 15
@@ -729,7 +715,6 @@ function logoutJudge(){
 </div>
 
 </>
-
 )}
 
             {f.category === 'theory' && (
