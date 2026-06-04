@@ -641,36 +641,36 @@ function logoutJudge(){
 
                 ))}
 
-                <div style={scoreBoxStyle}>
+          <div style={scoreBoxStyle}>
 
-                  รวมคะแนน
+  รวมคะแนน
 
-                  <div style={{
-                    fontSize:'32px',
-                    marginTop:'10px'
-                  }}>
-                    {
+  <div style={{
+    fontSize:'32px',
+    marginTop:'10px'
+  }}>
+    {
 
-                      (
-                        Number(f.maintenance || 0) +
-                        Number(f.outage || 0) +
-                        Number(f.patrol || 0) +
-                        Number(f.arboriculture || 0) +
-                        Number(f.thermal || 0)
+      (
+        Number(f.maintenance || 0) +
+        Number(f.outage || 0) +
+        Number(f.patrol || 0) +
+        Number(f.arboriculture || 0) +
+        Number(f.thermal || 0)
 
-                      ).toFixed(1)
+      ).toFixed(1)
 
-                    }
+    }
 
-                    / 60
+    / 60
 
-                  </div>
+  </div>
 
-                </div>
+</div>
 
-              </>
+</>
 
-            )}
+)}>
 
             {f.category === 'presentation' && (
 
@@ -705,35 +705,34 @@ function logoutJudge(){
                     presentation_qa:value
                   })}
                 />
+<div style={scoreBoxStyle}>
 
-                <div style={scoreBoxStyle}>
+  รวมคะแนน
 
-                  รวมคะแนน
+  <div style={{
+    fontSize:'32px',
+    marginTop:'10px'
+  }}>
+    {
 
-                  <div style={{
-                    fontSize:'32px',
-                    marginTop:'10px'
-                  }}>
-                    {
+      (
+        Number(f.presentation_check || 0) +
+        Number(f.presentation_analysis || 0) +
+        Number(f.presentation_qa || 0)
 
-                      (
-                        Number(f.presentation_check || 0) +
-                        Number(f.presentation_analysis || 0) +
-                        Number(f.presentation_qa || 0)
+      ).toFixed(1)
 
-                      ).toFixed(1)
+    }
 
-                    }
+    / 15
 
-                    / 15
+  </div>
 
-                  </div>
+</div>
 
-                </div>
+</>
 
-              </>
-
-            )}
+)}
 
             {f.category === 'theory' && (
 
