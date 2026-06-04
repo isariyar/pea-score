@@ -97,27 +97,29 @@ export default function App(){
     ? assistantCategories
     : normalCategories;
 
-  const [f,setF] = useState({
+const [f,setF] = useState({
 
-    team:teams[0],
+  team:teams[0],
 
-    category:categories[0].key,
+  category:categories[0].key,
 
-    score:'',
+  score:'',
 
-    maintenance:'',
-    outage:'',
-    patrol:'',
-    arboriculture:'',
-    thermal:'',
+  maintenance:'',
+  outage:'',
+  patrol:'',
+  arboriculture:'',
+  thermal:'',
 
-    presentation_check:'',
-    presentation_analysis:'',
-    presentation_qa:'',
+  presentation_check:'',
+  presentation_analysis:'',
+  presentation_qa:'',
 
-    signed:false
+  comment:'',
 
-  });
+  signed:false
+
+});
 
   useEffect(()=>{
     loadScores();
@@ -210,6 +212,7 @@ export default function App(){
       role:current.role,
       category:f.category,
       score:finalScore,
+comment:f.comment,
 
       maintenance:Number(f.maintenance || 0),
       outage:Number(f.outage || 0),
@@ -257,7 +260,7 @@ export default function App(){
       presentation_check:'',
       presentation_analysis:'',
       presentation_qa:'',
-
+comment:'',
       signed:false
 
     });
@@ -560,7 +563,26 @@ export default function App(){
                 ))}
 
                 <div style={scoreBoxStyle}>
+<div style={labelStyle}>
+  ข้อเสนอแนะ / Comment
+</div>
 
+<textarea
+  rows={5}
+  value={f.comment}
+  onChange={(e)=>
+    setF({
+      ...f,
+      comment:e.target.value
+    })
+  }
+  placeholder='ระบุข้อสังเกต ข้อดี ข้อควรปรับปรุง'
+  style={{
+    ...inputStyle,
+    minHeight:'120px',
+    resize:'vertical'
+  }}
+/>
                   รวมคะแนน
 
                   <div style={{
