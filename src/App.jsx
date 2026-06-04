@@ -14,21 +14,21 @@ const teams = [
 ];
 
 const judges = [
-  {name:'นางนงลักษณ์ สุวรรณจำรัส',email:'nongluk.suv@pea.co.th',password:'test1',role:'ประธาน'},
-  {name:'นายภักพงษ์ วงษ์พันธุ์ทา',email:'pakpong.won@pea.co.th',password:'test2',role:'กรรมการ'},
-  {name:'นายชิดชัย เพชรแก้วสุข',email:'chidchai.phe@pea.co.th',password:'test3',role:'กรรมการ'},
-  {name:'นายวีระศักดิ์ กนกหงส์',email:'weerasak.kan@pea.co.th',password:'test4',role:'กรรมการ'},
-  {name:'นายสุรเดช สุวรรณ',email:'suradet.suw@pea.co.th',password:'test5',role:'กรรมการ'},
-  {name:'นายยุทธนา ยิ้มประเสริฐ',email:'yutthana.yim@pea.co.th',password:'test6',role:'กรรมการ'},
-  {name:'นายวชิรพล คำเพิ่ม',email:'wachirapol.kha@pea.co.th',password:'test7',role:'กรรมการ'},
-  {name:'นายดอน ฉาฉ่ำ',email:'don.cha@pea.co.th',password:'test8',role:'กรรมการ'},
-  {name:'นายกฤษฎา เทพศาสตรา',email:'kritsada.the@pea.co.th',password:'test9',role:'กรรมการ'},
-  {name:'นายภาสกร วิชชาบูรณ์ดำรง',email:'passakorn.wic@pea.co.th',password:'test10',role:'กรรมการ'},
-  {name:'นางสาวปรายปวีย์ จันทร์วาสน์',email:'praipawee.cha@pea.co.th',password:'test11',role:'กรรมการ'},
-  {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',email:'santi.cha@pea.co.th',password:'test12',role:'กรรมการ'},
-  {name:'นายอานนท์ รอตรักษา',email:'arnond.rot@pea.co.th',password:'test13',role:'กรรมการและเลขาฯ'},
-  {name:'ทีมงาน กบร./ ศฝฟ.',email:'team@pea.co.th',password:'test14',role:'ผู้ช่วยกรรมการ'},
-  {name:'test1',email:'test@pea.co.th',password:'test15',role:'test'},
+  {name:'นางนงลักษณ์ สุวรรณจำรัส',role:'ประธาน'},
+  {name:'นายภักพงษ์ วงษ์พันธุ์ทา',role:'กรรมการ'},
+  {name:'นายชิดชัย เพชรแก้วสุข',role:'กรรมการ'},
+  {name:'นายวีระศักดิ์ กนกหงส์',role:'กรรมการ'},
+  {name:'นายสุรเดช สุวรรณ',role:'กรรมการ'},
+  {name:'นายยุทธนา ยิ้มประเสริฐ',role:'กรรมการ'},
+  {name:'นายวชิรพล คำเพิ่ม',role:'กรรมการ'},
+  {name:'นายดอน ฉาฉ่ำ',role:'กรรมการ'},
+  {name:'นายกฤษฎา เทพศาสตรา',role:'กรรมการ'},
+  {name:'นายภาสกร วิชชาบูรณ์ดำรง',role:'กรรมการ'},
+  {name:'นางสาวปรายปวีย์ จันทร์วาสน์',role:'กรรมการ'},
+  {name:'ว่าที่ร้อยตรี สันติ ไชยสีทา',role:'กรรมการ'},
+  {name:'นายอานนท์ รอตรักษา',role:'กรรมการและเลขาฯ'},
+  {name:'ทีมงาน กบร./ ศฝฟ.',role:'ผู้ช่วยกรรมการ'},
+  {name:'test1',role:'test'},
 ];
 
 const normalCategories = [
@@ -78,11 +78,13 @@ const onsiteTopics = [
 
 export default function App(){
 
-  const [loggedIn,setLoggedIn] = useState(false);
+  const [rows,setRows] = useState([]);
 
-const [loginEmail,setLoginEmail] = useState('');
+  const [user,setUser] = useState(judges[0].name);
 
-const [loginPassword,setLoginPassword] = useState('');
+  const [adminPass,setAdminPass] = useState('');
+
+  const [adminLogged,setAdminLogged] = useState(false);
 
   const current = judges.find(
     j=>j.name===user
@@ -122,32 +124,7 @@ const [f,setF] = useState({
   useEffect(()=>{
     loadScores();
   },[]);
-function loginJudge(){
 
-  const judge = judges.find(
-
-    j =>
-      j.email.toLowerCase() ===
-      loginEmail.toLowerCase()
-
-      &&
-
-      j.password === loginPassword
-
-  );
-
-  if(!judge){
-
-    alert('Email หรือ Password ไม่ถูกต้อง');
-
-    return;
-  }
-
-  setUser(judge.name);
-
-  setLoggedIn(true);
-
-}
   useEffect(()=>{
 
     setF(prev=>({
@@ -424,63 +401,33 @@ comment:'',
     );
 
   },[rows]);
-function logoutJudge(){
 
-  setLoggedIn(false);
+  return (
 
-  setLoginEmail('');
+    <div style={pageStyle}>
 
-  setLoginPassword('');
+      <div style={containerStyle}>
 
-  setUser('');
+        <div style={heroStyle}>
 
-}
- return (
+          <div style={{
+            fontSize:'42px',
+            fontWeight:'bold'
+          }}>
+            ⚡ Operation and Maintenance Score System 🏆
+          </div>
 
-  <div style={pageStyle}>
+          <div style={{
+            marginTop:'10px',
+            fontSize:'22px',
+            opacity:0.95
+          }}>
+            ระบบลงคะแนนการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
+          </div>
 
-    <button
-      onClick={logoutJudge}
-      style={{
-        position:'fixed',
-        top:'20px',
-        right:'20px',
-        background:'#ef4444',
-        color:'#fff',
-        border:'none',
-        padding:'10px 20px',
-        borderRadius:'12px',
-        cursor:'pointer',
-        fontWeight:'bold',
-        zIndex:9999
-      }}
-    >
-      Logout
-    </button>
-    <div style={heroStyle}>
+        </div>
 
-  <div
-    style={{
-      fontSize:'42px',
-      fontWeight:'bold'
-    }}
-  >
-    ⚡ Operation and Maintenance Score System 🏆
-  </div>
-
-  <div
-    style={{
-      marginTop:'10px',
-      fontSize:'22px',
-      opacity:0.95
-    }}
-  >
-    ระบบลงคะแนนการแข่งขันการปฏิบัติการและบำรุงรักษาระบบไฟฟ้า
-  </div>
-
-</div>
-
-<div style={gridStyle}>
+        <div style={gridStyle}>
 
           <div style={cardStyle}>
 
@@ -560,106 +507,134 @@ function logoutJudge(){
               ))}
 
             </select>
-{f.category === 'onsite' && (
-  <>
-    <div style={labelStyle}>
-      ข้อเสนอแนะเพิ่มเติม
-    </div>
 
-    <textarea
-      rows={5}
-      value={f.comment || ''}
-      onChange={(e)=>
-        setF({
-          ...f,
-          comment:e.target.value
-        })
-      }
-      placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
-      style={{
-        ...inputStyle,
-        minHeight:'120px',
-        resize:'vertical'
-      }}
-    />
-
-    {onsiteTopics.map(topic => (
-
-      <div key={topic.key}>
-
-        <div style={labelStyle}>
-          {topic.label} (0-12)
-        </div>
-
-        <input
-          type='number'
-          min='0'
-          max='12'
-          step='0.1'
-          value={f[topic.key]}
-          onChange={e=>{
-
-            const value = e.target.value;
-
-            if(value === ''){
-
-              setF({
-                ...f,
-                [topic.key]:''
-              });
-
-              return;
-            }
-
-            let score = Number(value);
-
-            if(score > 12){
-              score = 12;
-            }
-
-            if(score < 0){
-              score = 0;
-            }
-
-            setF({
-              ...f,
-              [topic.key]:score
-            });
-
-          }}
-          style={inputStyle}
-        />
-
-      </div>
-
-    ))}
-
-<div style={scoreBoxStyle}>
-
-  รวมคะแนน
-
-  <div
-    style={{
-      fontSize:'32px',
-      marginTop:'10px'
-    }}
-  >
-    {
-      (
-        Number(f.presentation_check || 0) +
-        Number(f.presentation_analysis || 0) +
-        Number(f.presentation_qa || 0)
-      ).toFixed(1)
-    }
-
-    / 15
-
-  </div>
-
+            {f.category === 'onsite' && (
+       <> 
+<div style={labelStyle}>
+  ข้อเสนอแนะเพิ่มเติม
 </div>
 
-</>
-)}
+<textarea
+  rows={5}
+  value={f.comment}
+  onChange={(e)=>
+    setF({
+      ...f,
+      comment:e.target.value
+    })
+  }
+  placeholder='พิมพ์ข้อสังเกต ข้อเสนอแนะ หรือจุดที่ต้องปรับปรุง'
+  style={{
+    ...inputStyle,
+    minHeight:'120px',
+    resize:'vertical'
+  }}
+/>
+              <>
+                {onsiteTopics.map(topic=>(
+
+                  <div key={topic.key}>
+
+                    <div style={labelStyle}>
+                      {topic.label} (0-12)
+                    </div>
+
+                    <input
+                      type='number'
+                      min='0'
+                      max='12'
+                      step='0.1'
+                      value={f[topic.key]}
+                      onChange={e=>{
+
+  const value = e.target.value;
+
+  if(value === ''){
+
+    setF({
+      ...f,
+      [topic.key]:''
+    });
+
+    return;
+  }
+
+  let score = Number(value);
+
+  if(score > 12){
+    score = 12;
+  }
+
+  if(score < 0){
+    score = 0;
+  }
+
+  setF({
+    ...f,
+    [topic.key]:score
+  });
+
+                      }}
+                      style={inputStyle}
+                    />
+
+                  </div>
+
+                ))}
+
+                <div style={scoreBoxStyle}>
+<div style={labelStyle}>
+  ข้อเสนอแนะ / Comment
+</div>
+
+<textarea
+  rows={5}
+  value={f.comment}
+  onChange={(e)=>
+    setF({
+      ...f,
+      comment:e.target.value
+    })
+  }
+  placeholder='ระบุข้อสังเกต ข้อดี ข้อควรปรับปรุง'
+  style={{
+    ...inputStyle,
+    minHeight:'120px',
+    resize:'vertical'
+  }}
+/>
+                  รวมคะแนน
+
+                  <div style={{
+                    fontSize:'32px',
+                    marginTop:'10px'
+                  }}>
+                    {
+
+                      (
+                        Number(f.maintenance || 0) +
+                        Number(f.outage || 0) +
+                        Number(f.patrol || 0) +
+                        Number(f.arboriculture || 0) +
+                        Number(f.thermal || 0)
+
+                      ).toFixed(1)
+
+                    }
+
+                    / 60
+
+                  </div>
+
+                </div>
+
+              </>
+
+            )}
+
+            {f.category === 'presentation' && (
+
+              <>
 
                 <ScoreInput
                   label='ตรวจสอบสิ่งผิดปกติ'
@@ -690,32 +665,35 @@ function logoutJudge(){
                     presentation_qa:value
                   })}
                 />
-<div style={scoreBoxStyle}>
 
-  รวมคะแนน
+                <div style={scoreBoxStyle}>
 
-  <div
-    style={{
-      fontSize:'32px',
-      marginTop:'10px'
-    }}
-  >
-    {
-      (
-        Number(f.presentation_check || 0) +
-        Number(f.presentation_analysis || 0) +
-        Number(f.presentation_qa || 0)
-      ).toFixed(1)
-    }
+                  รวมคะแนน
 
-    / 15
+                  <div style={{
+                    fontSize:'32px',
+                    marginTop:'10px'
+                  }}>
+                    {
 
-  </div>
+                      (
+                        Number(f.presentation_check || 0) +
+                        Number(f.presentation_analysis || 0) +
+                        Number(f.presentation_qa || 0)
 
-</div>
+                      ).toFixed(1)
 
-</>
-)}
+                    }
+
+                    / 15
+
+                  </div>
+
+                </div>
+
+              </>
+
+            )}
 
             {f.category === 'theory' && (
 
@@ -1269,3 +1247,4 @@ const tdStyle = {
   textAlign:'center',
   borderBottom:'1px solid #f1f5f9'
 };
+
