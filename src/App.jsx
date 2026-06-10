@@ -766,7 +766,6 @@ comment:'',
  </>
 )}
           </div>
-</>
           <div style={cardStyle}>
 
             <div style={titleStyle}>
@@ -970,69 +969,75 @@ comment:'',
 
       ))}
 
-    </tbody>
+<table>
+  <tbody>
+    {data.map((r, i) => (
+      <tr key={i}>
+        <td style={tdStyle}>
+          {i + 1}
+        </td>
 
-  </table>
+        <td style={tdStyle}>
+          <b>{r.team}</b>
+        </td>
 
-</div>
-                    <tr key={i}>
+        <td style={tdStyle}>
+          {r.maintenanceAvg}
+        </td>
 
-                      <td style={tdStyle}>
-                        {i+1}
-                      </td>
+        <td style={tdStyle}>
+          {r.outageAvg}
+        </td>
 
-                      <td style={tdStyle}>
-                        <b>{r.team}</b>
-                      </td>
+        <td style={tdStyle}>
+          {r.patrolAvg}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.maintenanceAvg}
-                      </td>
+        <td style={tdStyle}>
+          {r.arboricultureAvg}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.outageAvg}
-                      </td>
+        <td style={tdStyle}>
+          {r.thermalAvg}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.patrolAvg}
-                      </td>
+        <td
+          style={{
+            ...tdStyle,
+            background: '#dbeafe',
+            fontWeight: 'bold'
+          }}
+        >
+          {r.onsiteTotal}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.arboricultureAvg}
-                      </td>
+        <td style={tdStyle}>
+          {r.presentationTotal}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.thermalAvg}
-                      </td>
+        <td style={tdStyle}>
+          {r.theoryTotal}
+        </td>
 
-                      <td style={{
-                        ...tdStyle,
-                        background:'#dbeafe',
-                        fontWeight:'bold'
-                      }}>
-                        {r.onsiteTotal}
-                      </td>
+        <td style={tdStyle}>
+          {r.fieldworkTotal}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.presentationTotal}
-                      </td>
+        <td
+          style={{
+            ...tdStyle,
+            background: '#dcfce7',
+            fontWeight: 'bold',
+            fontSize: '18px'
+          }}
+        >
+          {r.grandTotal}
+        </td>
 
-                      <td style={tdStyle}>
-                        {r.theoryTotal}
-                      </td>
-
-                      <td style={tdStyle}>
-                        {r.fieldworkTotal}
-                      </td>
-
-                      <td style={{
-                        ...tdStyle,
-                        background:'#dcfce7',
-                        fontWeight:'bold',
-                        fontSize:'18px'
-                      }}>
-                        {r.grandTotal}
-                      </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
 <td
   style={{
     ...tdStyle,
