@@ -409,14 +409,7 @@ comment:'',
       <div style={containerStyle}>
 
         <div style={heroStyle}>
- <img
-    src={logo}
-    alt="logo"
-    style={{
-      width:'100px',
-      marginBottom:'20px'
-    }}
-  />
+
           <div style={{
             fontSize:'42px',
             fontWeight:'bold'
@@ -773,6 +766,7 @@ comment:'',
  </>
 )}
           </div>
+</>
           <div style={cardStyle}>
 
             <div style={titleStyle}>
