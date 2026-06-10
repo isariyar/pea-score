@@ -763,9 +763,10 @@ comment:'',
             >
               🚀 ส่งคะแนน
             </button>
-
+ </>
+)}
           </div>
-
+</>
           <div style={cardStyle}>
 
             <div style={titleStyle}>
