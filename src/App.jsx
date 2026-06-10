@@ -1000,85 +1000,77 @@ comment:'',
         <td style={tdStyle}>
           {r.thermalAvg}
         </td>
+<tbody>
+  {rows.map((r, i) => (
+    <tr key={i}>
 
-        <td
-          style={{
-            ...tdStyle,
-            background: '#dbeafe',
-            fontWeight: 'bold'
-          }}
-        >
-          {r.onsiteTotal}
-        </td>
+      <td style={tdStyle}>{i + 1}</td>
 
-        <td style={tdStyle}>
-          {r.presentationTotal}
-        </td>
+      <td style={tdStyle}>
+        <b>{r.team}</b>
+      </td>
 
-        <td style={tdStyle}>
-          {r.theoryTotal}
-        </td>
+      <td style={tdStyle}>{r.maintenanceAvg}</td>
 
-        <td style={tdStyle}>
-          {r.fieldworkTotal}
-        </td>
+      <td style={tdStyle}>{r.outageAvg}</td>
 
-        <td
-          style={{
-            ...tdStyle,
-            background: '#dcfce7',
-            fontWeight: 'bold',
-            fontSize: '18px'
-          }}
-        >
-          {r.grandTotal}
-        </td>
+      <td style={tdStyle}>{r.patrolAvg}</td>
 
-      </tr>
-    ))}
-  </tbody>
-</table>
-<td
-  style={{
-    ...tdStyle,
-    textAlign:'left',
-    minWidth:'350px'
-  }}
->
-  {rows
-    .filter(
-      x =>
-        x.team === r.team &&
-        x.category === 'onsite' &&
-        x.comment
-    )
-    .map((x,i)=>(
-      <div key={i}>
-        <b>{x.judge}</b> : {x.comment}
-      </div>
-    ))
-  }
-</td>
-                    </tr>
+      <td style={tdStyle}>{r.arboricultureAvg}</td>
 
-                  ))}
+      <td style={tdStyle}>{r.thermalAvg}</td>
 
-                </tbody>
+      <td
+        style={{
+          ...tdStyle,
+          background: '#dbeafe',
+          fontWeight: 'bold'
+        }}
+      >
+        {r.onsiteTotal}
+      </td>
 
-              </table>
+      <td style={tdStyle}>{r.presentationTotal}</td>
 
+      <td style={tdStyle}>{r.theoryTotal}</td>
+
+      <td style={tdStyle}>{r.fieldworkTotal}</td>
+
+      <td
+        style={{
+          ...tdStyle,
+          background: '#dcfce7',
+          fontWeight: 'bold',
+          fontSize: '18px'
+        }}
+      >
+        {r.grandTotal}
+      </td>
+
+      <td
+        style={{
+          ...tdStyle,
+          textAlign: 'left',
+          minWidth: '350px'
+        }}
+      >
+        {rows
+          .filter(
+            x =>
+              x.team === r.team &&
+              x.category === 'onsite' &&
+              x.comment
+          )
+          .map((x, j) => (
+            <div key={j}>
+              <b>{x.judge}</b> : {x.comment}
             </div>
+          ))}
+      </td>
 
-          )}
-
-        </div>
-
-      </div>
-
-    </div>
-
-  );
-
+    </tr>
+  ))}
+</tbody>
 }
 
 function ScoreInput({
