@@ -773,7 +773,6 @@ comment:'',
  </>
 )}
           </div>
-</>
           <div style={cardStyle}>
 
             <div style={titleStyle}>
