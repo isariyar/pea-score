@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-
+import logo from './assets/logo.png';
 const supabase = createClient(
   'https://zhivpkjrgobfwzvcclnb.supabase.co',
   'sb_publishable_KsiY5dGDvyqVcBfp8usNMw_HOLU_Mfr'
@@ -408,14 +408,23 @@ comment:'',
 
       <div style={containerStyle}>
 
-        <div style={heroStyle}>
+       <div style={heroStyle}>
 
-          <div style={{
-            fontSize:'42px',
-            fontWeight:'bold'
-          }}>
-            ⚡ Operation and Maintenance Score System 🏆
-          </div>
+<img
+ src={logo}
+ alt="logo"
+ style={{
+   width:'100px',
+   marginBottom:'20px'
+ }}
+/>
+
+<div style={{
+fontSize:'42px',
+fontWeight:'bold'
+}}>
+⚡ Operation and Maintenance Score System 🏆
+</div>
 
           <div style={{
             marginTop:'10px',
@@ -1141,14 +1150,15 @@ const containerStyle = {
 };
 
 const heroStyle = {
-  background:'rgba(255,255,255,0.1)',
-  border:'1px solid rgba(255,255,255,0.12)',
-  backdropFilter:'blur(14px)',
+  background:'rgba(255,255,255,0.12)',
+  border:'1px solid rgba(255,255,255,0.2)',
+  backdropFilter:'blur(18px)',
   borderRadius:'30px',
-  padding:'35px',
+  padding:'40px',
   color:'#fff',
   marginBottom:'30px',
-  boxShadow:'0 15px 40px rgba(0,0,0,0.25)'
+  boxShadow:'0 20px 50px rgba(0,0,0,0.3)'
+   textAlign:'center'
 };
 
 const gridStyle = {
